@@ -21,6 +21,14 @@ node_modules
 MOTIONS_SOCIAL/
 FOTOS GUEDES/
 
+# Legacy V1 folders & Reference Assets
+artifacts/
+attached_assets/
+lib/
+scripts/
+skills/
+
+
 
 
 # IDEs and editors
