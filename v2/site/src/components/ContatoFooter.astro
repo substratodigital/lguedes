@@ -1,0 +1,288 @@
+---
+import { type Lang, useT, SITE } from '../i18n';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const ct = t.contato as any;
+---
+
+<footer id="contato" class="cf">
+  <div class="cf__grid-bg dot-grid" aria-hidden="true"></div>
+
+  <div class="container cf__top">
+    <!-- Formulário -->
+    <div class="cf__form-col">
+      <span class="eyebrow" data-cf-in>{ct.label}</span>
+      <h2 class="cf__title" data-cf-in>{ct.h2}</h2>
+      <p class="cf__lead" data-cf-in>{ct.p}</p>
+
+      <div id="cf-success" class="cf__success" hidden>
+        <span class="cf__success-ico"><Icon name="MessageSquare" size={28} /></span>
+        <h3>{ct.successTitle}</h3>
+        <p>{ct.successDesc}</p>
+        <button type="button" id="cf-reset" class="cf__link">{ct.successLink}</button>
+      </div>
+
+      <form id="cf-form" class="cf__form" novalidate data-cf-in>
+        <div class="cf__row">
+          <label class="cf__field">
+            <span>{ct.nameLabel}</span>
+            <input name="name" type="text" autocomplete="name" placeholder={ct.namePlaceholder} required minlength="2" />
+            <em data-err>{ct.nameError}</em>
+          </label>
+          <label class="cf__field">
+            <span>{ct.emailLabel}</span>
+            <input name="email" type="email" autocomplete="email" placeholder={ct.emailPlaceholder} required />
+            <em data-err>{ct.emailError}</em>
+          </label>
+        </div>
+        <div class="cf__row">
+          <label class="cf__field">
+            <span>{ct.whatsappLabel}</span>
+            <input name="whatsapp" type="tel" autocomplete="tel" placeholder={ct.whatsappPlaceholder} required minlength="8" />
+            <em data-err>{ct.whatsappError}</em>
+          </label>
+          <label class="cf__field">
+            <span>{ct.typeLabel}</span>
+            <div class="cf__select">
+              <select name="type" required>
+                <option value="" disabled selected>{ct.typePlaceholder}</option>
+                {ct.typeOptions.map((o: any) => <option value={o.value}>{o.label}</option>)}
+              </select>
+              <Icon name="ChevronDown" size={16} />
+            </div>
+            <em data-err>{ct.typeError}</em>
+          </label>
+        </div>
+
+        <label class="cf__consent">
+          <input type="checkbox" name="consent" required />
+          <span>{ct.consentLabel ?? ''}</span>
+        </label>
+        <em class="cf__consent-err" data-err-consent>{ct.consentError ?? ''}</em>
+
+        <button type="submit" class="btn cf__submit">
+          <span data-label>{ct.submit}</span>
+          <Icon name="ArrowRight" size={18} stroke={2} />
+        </button>
+      </form>
+    </div>
+
+    <!-- Retrato formal (ASCII leve sobre fundo claro, revela a foto no hover) -->
+    <div class="cf__photo-col" aria-hidden="true">
+      <div class="cf__portrait" id="cf-portrait">
+        <img class="cf__photo" src="/img/guedes-formal.webp" alt="" width="1080" height="921" loading="lazy" decoding="async" />
+        <canvas class="cf__ascii" id="cf-ascii"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wordmark -->
+  <div class="cf__wordmark" aria-hidden="true">
+    <img src="/img/GUEDES-AI__COLOR_LOGO.svg" alt="" loading="lazy" id="cf-wordmark" />
+  </div>
+
+  <div class="cf__bottom">
+    <div class="container cf__bottom-inner">
+      <div class="cf__brand">
+        <span class="cf__logo">GUEDES<span>.</span>AI</span>
+        <span class="cf__copy font-mono">© {new Date().getFullYear()} Luís Fernando Ascensão Guedes</span>
+      </div>
+      <div class="cf__social">
+        <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><Icon name="MessageCircle" size={18} /></a>
+        <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><Icon name="Linkedin" size={18} /></a>
+        <a href={`mailto:${SITE.email}`} aria-label="E-mail"><Icon name="Mail" size={18} /></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .cf { position: relative; background: var(--bg); border-top: 1px solid var(--line); overflow: hidden; isolation: isolate; }
+  .cf__grid-bg { position: absolute; inset: 0; z-index: -1; -webkit-mask-image: linear-gradient(to bottom, #000, transparent 85%); mask-image: linear-gradient(to bottom, #000, transparent 85%); }
+  .cf::before {
+    content: ''; position: absolute; z-index: -1; right: -10%; top: 0; width: 60vmax; height: 60vmax;
+    background: radial-gradient(closest-side, hsl(243 90% 94%), transparent 70%);
+  }
+
+  .cf__top {
+    display: grid; grid-template-columns: 1fr; gap: 2rem;
+    padding-top: clamp(4.5rem, 9vw, 7.5rem);
+  }
+  @media (min-width: 1024px) { .cf__top { grid-template-columns: 1fr 1fr; gap: 3rem; align-items: end; } }
+
+  .cf__form-col { padding-bottom: clamp(1rem, 4vw, 3rem); position: relative; z-index: 2; }
+  .cf__title { font-size: var(--fs-h2); font-weight: 700; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: .75rem; }
+  .cf__lead { font-size: var(--fs-lg); color: var(--ink-2); margin-bottom: 2.25rem; }
+
+  .cf__form { display: flex; flex-direction: column; gap: 1.1rem; max-width: 34rem; }
+  .cf__row { display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .cf__row { grid-template-columns: 1fr 1fr; } }
+
+  .cf__field { display: flex; flex-direction: column; gap: .4rem; }
+  .cf__field > span { font-size: .75rem; font-weight: 500; color: var(--ink-2); }
+  .cf__field input, .cf__select select {
+    width: 100%; height: 3.25rem; padding-inline: 1.35rem;
+    border-radius: var(--radius-pill); border: 1px solid var(--line-strong);
+    background: hsl(240 15% 95%); color: var(--ink); font-size: .9rem;
+    transition: border-color .2s, background-color .2s, box-shadow .2s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .cf__field input::placeholder { color: var(--ink-3); }
+  .cf__field input:focus, .cf__select select:focus {
+    outline: none; background: var(--surface); border-color: var(--primary);
+    box-shadow: 0 0 0 4px hsl(243 75% 59% / .12);
+  }
+  .cf__select { position: relative; }
+  .cf__select :global(.icon) { position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%); color: var(--ink-3); pointer-events: none; }
+  .cf__select select:invalid { color: var(--ink-3); }
+
+  .cf__field em, .cf__consent-err { display: none; font-style: normal; font-size: .7rem; color: hsl(350 80% 48%); padding-left: 1.35rem; }
+  .cf__field.is-invalid em, .cf__consent-err.is-invalid { display: block; }
+  .cf__field.is-invalid input, .cf__field.is-invalid select { border-color: hsl(350 80% 60%); }
+  .cf__consent-err { padding-left: 1.9rem; margin-top: -.6rem; }
+
+  .cf__consent { display: flex; gap: .75rem; align-items: flex-start; font-size: .72rem; color: var(--ink-3); line-height: 1.5; cursor: pointer; margin-top: .25rem; }
+  .cf__consent input { width: 1.1rem; height: 1.1rem; margin-top: .1rem; flex-shrink: 0; accent-color: var(--primary); }
+
+  .cf__submit { height: 3.4rem; margin-top: .5rem; width: 100%; }
+
+  .cf__success {
+    max-width: 34rem; padding: 3rem 2rem; text-align: center;
+    border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface);
+  }
+  .cf__success-ico { display: inline-flex; color: var(--primary); margin-bottom: 1rem; }
+  .cf__success h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: .4rem; }
+  .cf__success p { color: var(--ink-2); margin-bottom: 1.5rem; }
+  .cf__link { font-weight: 600; color: var(--primary); }
+
+  /* Retrato */
+  .cf__photo-col { display: flex; justify-content: center; align-items: flex-end; }
+  .cf__portrait { position: relative; width: min(100%, 560px); aspect-ratio: 1080 / 921; }
+  .cf__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom; }
+  .cf__ascii { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  :global(.js) .cf__photo { clip-path: circle(0% at var(--mx, 50%) var(--my, 40%)); transition: clip-path .7s var(--ease-out); }
+  :global(.js) .cf__portrait:hover .cf__photo { clip-path: circle(var(--r, 28%) at var(--mx, 50%) var(--my, 40%)); transition: clip-path .5s var(--ease-out); }
+  .cf__portrait { pointer-events: auto; }
+
+  /* Wordmark */
+  .cf__wordmark { padding-inline: var(--gutter); margin-top: -1rem; position: relative; z-index: 1; pointer-events: none; }
+  .cf__wordmark img { width: 100%; max-width: 1500px; margin-inline: auto; }
+
+  .cf__bottom { margin-top: clamp(1.5rem, 3vw, 2.5rem); border-top: 1px solid var(--line); padding-block: 1.5rem; }
+  .cf__bottom-inner { display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; }
+  @media (min-width: 768px) { .cf__bottom-inner { flex-direction: row; } }
+  .cf__brand { display: flex; flex-direction: column; align-items: center; gap: .25rem; }
+  @media (min-width: 768px) { .cf__brand { align-items: flex-start; } }
+  .cf__logo { font-weight: 700; letter-spacing: -0.02em; }
+  .cf__logo span { color: var(--primary); }
+  .cf__copy { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .cf__social { display: flex; gap: 1.25rem; }
+  .cf__social a { color: var(--ink-3); transition: color .2s, transform .3s var(--ease-out); }
+  .cf__social a:hover { color: var(--ink); transform: translateY(-2px); }
+
+  :global(.js) [data-cf-in] { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) { :global(.js) [data-cf-in] { opacity: 1; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── Retrato em ASCII (Canvas 2D, desenhado UMA vez; redesenha só no resize) ── */
+  const portrait = document.getElementById('cf-portrait') as HTMLElement;
+  const canvas = document.getElementById('cf-ascii') as HTMLCanvasElement;
+  const photo = portrait.querySelector('img') as HTMLImageElement;
+  const GLYPHS = ' .:-=+*#%@';
+  let cells: { x: number; y: number; ch: string; c: string }[] = [];
+
+  function drawAscii() {
+    const r = portrait.getBoundingClientRect();
+    if (!r.width || !photo.naturalWidth) return;
+    const dpr = Math.min(devicePixelRatio || 1, 1.5);
+    const cell = r.width < 420 ? 6 : 8;
+    const cols = Math.floor(r.width / cell), rows = Math.floor(r.height / cell);
+    const off = document.createElement('canvas'); off.width = cols; off.height = rows;
+    const o = off.getContext('2d', { willReadFrequently: true })!;
+    o.drawImage(photo, 0, 0, cols, rows);
+    const data = o.getImageData(0, 0, cols, rows).data;
+
+    canvas.width = r.width * dpr; canvas.height = r.height * dpr;
+    const ctx = canvas.getContext('2d')!;
+    ctx.scale(dpr, dpr);
+    ctx.font = `600 ${cell * 1.05}px GeistMono, ui-monospace, monospace`;
+    ctx.textBaseline = 'top';
+    cells = [];
+    for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+      const i = (y * cols + x) * 4, a = data[i + 3] / 255;
+      if (a < 0.15) continue;
+      const lum = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+      const d = Math.min(1, Math.max(0, (1 - lum) * 1.15));
+      const ch = GLYPHS[Math.round(d * (GLYPHS.length - 1))];
+      if (ch === ' ') continue;
+      const c = lum > 0.62 ? '#4F46E5' : '#14141F';
+      cells.push({ x: x * cell, y: y * cell, ch, c });
+    }
+    cells.forEach((k) => { ctx.fillStyle = k.c; ctx.globalAlpha = 0.9; ctx.fillText(k.ch, k.x, k.y); });
+  }
+
+  const ready = () => document.fonts?.load('600 10px GeistMono').catch(() => null);
+  const startAscii = async () => {
+    if (!photo.complete) await photo.decode().catch(() => null);
+    await ready();
+    drawAscii();
+    let t = 0;
+    new ResizeObserver(() => { clearTimeout(t); t = window.setTimeout(drawAscii, 150); }).observe(portrait);
+  };
+  // carrega só quando perto da viewport
+  new IntersectionObserver(([e], o) => { if (e.isIntersecting) { o.disconnect(); photo.loading = 'eager'; startAscii(); } }, { rootMargin: '400px' }).observe(portrait);
+
+  // Lente: revela a foto real sob o cursor
+  portrait.addEventListener('pointermove', (e) => {
+    const r = portrait.getBoundingClientRect();
+    portrait.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+    portrait.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+  }, { passive: true });
+
+  /* ── Entrada GSAP ── */
+  if (!reduced) {
+    const els = document.querySelectorAll('[data-cf-in]');
+    new IntersectionObserver(([e], o) => {
+      if (!e.isIntersecting) return; o.disconnect();
+      gsap.fromTo(els, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.08, ease: 'power3.out' });
+      gsap.fromTo(canvas, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'power2.out', delay: 0.15 });
+      gsap.fromTo('#cf-wordmark', { autoAlpha: 0, yPercent: 30 }, { autoAlpha: 1, yPercent: 0, duration: 1, ease: 'power3.out', delay: 0.25 });
+    }, { threshold: 0.15 }).observe(document.getElementById('contato')!);
+  }
+
+  /* ── Formulário ── */
+  const form = document.getElementById('cf-form') as HTMLFormElement;
+  const success = document.getElementById('cf-success') as HTMLElement;
+  const label = form.querySelector('[data-label]') as HTMLElement;
+  const submitTxt = label.textContent || '';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let ok = true;
+    form.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input:not([type=checkbox]), select').forEach((el) => {
+      const field = el.closest('.cf__field')!;
+      const valid = el.checkValidity();
+      field.classList.toggle('is-invalid', !valid);
+      if (!valid) ok = false;
+    });
+    const consent = form.querySelector<HTMLInputElement>('[name=consent]')!;
+    form.querySelector('[data-err-consent]')!.classList.toggle('is-invalid', !consent.checked);
+    if (!consent.checked) ok = false;
+    if (!ok) return;
+
+    label.textContent = (document.documentElement.lang === 'en' ? 'Sending...' : 'Enviando...');
+    await new Promise((r) => setTimeout(r, 800)); // TODO: integrar envio real (Formspree/Resend)
+    form.reset(); label.textContent = submitTxt;
+    form.hidden = true; success.hidden = false;
+    if (!reduced) gsap.fromTo(success, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' });
+  });
+  form.addEventListener('input', (e) => (e.target as HTMLElement).closest('.cf__field')?.classList.remove('is-invalid'));
+  document.getElementById('cf-reset')!.addEventListener('click', () => { success.hidden = true; form.hidden = false; });
+</script>

@@ -1,0 +1,59 @@
+---
+import '../styles/global.css';
+import { type Lang, SITE, homePath } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+}
+const { lang, title, description } = Astro.props;
+const canonical = new URL(homePath(lang), SITE.url).href;
+const htmlLang = lang === 'pt' ? 'pt-BR' : 'en';
+---
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#FBFBFD" />
+    <meta name="color-scheme" content="light" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="pt-BR" href={new URL('/', SITE.url).href} />
+    <link rel="alternate" hreflang="en" href={new URL('/en/', SITE.url).href} />
+    <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+
+    <!-- Fontes críticas -->
+    <link rel="preload" href="/fonts/GeistSans-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/GeistPixel.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/img/opengraph.jpg', SITE.url).href} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Luís Fernando Ascensão Guedes',
+      alternateName: 'Luís Guedes',
+      url: SITE.url,
+      jobTitle: lang === 'pt' ? 'Professor, palestrante e consultor em IA' : 'Professor, speaker and AI consultant',
+      sameAs: [SITE.linkedin],
+    })} />
+
+    <!-- Marca o documento como JS-ativo antes do paint (evita flash do estado inicial das animações) -->
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <slot />
+    <script>
+      import '../scripts/animations.ts';
+    </script>
+  </body>
+</html>

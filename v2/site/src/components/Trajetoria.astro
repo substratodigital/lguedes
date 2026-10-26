@@ -1,0 +1,168 @@
+---
+import { type Lang, useT } from '../i18n';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const rows = [
+  { key: 'exp', label: t.trajetoria.experienciaLabel, icon: 'Briefcase', accent: '#6366f1', items: t.trajetoria.experiencia as any[] },
+  { key: 'edu', label: t.trajetoria.educacaoLabel, icon: 'GraduationCap', accent: '#0d9488', items: t.trajetoria.educacao as any[] },
+] as const;
+---
+
+<section id="experiencia" class="section trajetoria">
+  <div class="container">
+    <div class="traj__header" data-reveal>
+      <span class="eyebrow">{t.trajetoria.label}</span>
+      <h2 class="h2 traj__title">{t.trajetoria.h2}</h2>
+    </div>
+  </div>
+
+  {rows.map((row, r) => (
+    <div class="traj__row" style={`--accent:${row.accent}`} data-reveal data-delay={(r * 0.12).toFixed(2)}>
+      <div class="container">
+        <span class="traj__badge">
+          <Icon name={row.icon} size={13} stroke={2} />
+          {row.label}
+        </span>
+      </div>
+
+      <!-- Carrossel infinito (GSAP). O conjunto é duplicado para o loop sem emenda. -->
+      <div class="traj__viewport" data-loop data-speed={r === 0 ? 42 : 48} data-dir={r === 0 ? 1 : -1}>
+        <div class="traj__track" data-loop-track>
+          {[0, 1].map((copy) => (
+            <div class="traj__set" aria-hidden={copy === 1 ? 'true' : undefined}>
+              {row.items.map((item) => (
+                <article class="traj__cell">
+                  <p class="traj__period font-mono">{item.period}</p>
+                  <h3 class="traj__org">{item.org}</h3>
+                  <div class="traj__line" aria-hidden="true"><span class="traj__dot"></span></div>
+                  <p class="traj__role">{item.role}</p>
+                  {'bullets' in item ? (
+                    <ul class="traj__bullets">
+                      {item.bullets.map((b: string) => <li>{b}</li>)}
+                    </ul>
+                  ) : (
+                    <p class="traj__desc">{item.desc}</p>
+                  )}
+                </article>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  ))}
+</section>
+
+<style>
+  .trajetoria { background: var(--bg); overflow: hidden; }
+  .traj__header { margin-bottom: clamp(3rem, 6vw, 4.5rem); }
+  .traj__title { white-space: pre-line; }
+
+  .traj__row + .traj__row { margin-top: 4rem; }
+
+  .traj__badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .65rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+    padding: .4rem .9rem; border-radius: var(--radius-pill);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    margin-bottom: 1.75rem;
+  }
+
+  .traj__viewport {
+    position: relative; overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .traj__track { display: flex; width: max-content; will-change: transform; }
+  .traj__set { display: flex; }
+
+  .traj__cell { width: 270px; flex-shrink: 0; padding-right: 2rem; }
+  .traj__period { font-size: .7rem; color: var(--ink-3); letter-spacing: .04em; margin-bottom: .15rem; }
+  .traj__org { font-size: 1.05rem; font-weight: 700; color: var(--ink); line-height: 1.25; min-height: 1.3em; }
+
+  /* Linha contínua: cada célula desenha seu segmento + ponto */
+  .traj__line { position: relative; height: 24px; margin: .75rem -2rem 1rem 0; }
+  .traj__line::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px;
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .traj__dot {
+    position: absolute; left: 0; top: 50%; width: 12px; height: 12px; transform: translateY(-50%);
+    border-radius: 50%; border: 2px solid var(--accent); background: var(--bg);
+  }
+
+  .traj__role { font-size: .9rem; font-weight: 600; color: var(--ink); margin-bottom: .5rem; }
+  .traj__desc { font-size: .8rem; color: var(--ink-2); line-height: 1.55; }
+  .traj__bullets { list-style: none; display: flex; flex-direction: column; gap: .35rem; }
+  .traj__bullets li { position: relative; padding-left: .9rem; font-size: .8rem; color: var(--ink-2); line-height: 1.5; }
+  .traj__bullets li::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('#experiencia [data-loop]').forEach((vp) => {
+    const track = vp.querySelector<HTMLElement>('[data-loop-track]')!;
+    const set = track.firstElementChild as HTMLElement;
+    const speed = Number(vp.dataset.speed || 45);   // px/s
+    const dir = Number(vp.dataset.dir || 1);
+    if (reduced) return;
+
+    let tween: gsap.core.Tween | null = null;
+    const build = () => {
+      tween?.kill();
+      const w = set.offsetWidth;
+      gsap.set(track, { x: dir > 0 ? 0 : -w });
+      tween = gsap.to(track, {
+        x: dir > 0 ? -w : 0,
+        duration: w / speed,
+        ease: 'none',
+        repeat: -1,
+      });
+      tween.pause();
+      if (visible) tween.play();
+    };
+
+    // Só anima quando visível (economia de CPU)
+    let visible = false;
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      visible ? tween?.play() : tween?.pause();
+    }).observe(vp);
+
+    // Desacelera suavemente no hover
+    vp.addEventListener('pointerenter', () => tween && gsap.to(tween, { timeScale: 0, duration: 0.6, ease: 'power2.out' }));
+    vp.addEventListener('pointerleave', () => tween && gsap.to(tween, { timeScale: 1, duration: 0.6, ease: 'power2.in' }));
+
+    // Arraste no touch/mouse
+    let startX = 0, startP = 0, dragging = false;
+    vp.addEventListener('pointerdown', (e) => {
+      if (!tween) return;
+      dragging = true; startX = e.clientX; startP = tween.progress();
+      tween.pause();
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging || !tween) return;
+      const w = set.offsetWidth;
+      let p = startP - ((e.clientX - startX) / w) * dir;
+      p = ((p % 1) + 1) % 1;
+      tween.progress(p);
+    }, { passive: true });
+    window.addEventListener('pointerup', () => {
+      if (!dragging) return;
+      dragging = false;
+      if (visible) tween?.play();
+    });
+
+    let rt = 0;
+    new ResizeObserver(() => { clearTimeout(rt); rt = window.setTimeout(build, 120); }).observe(set);
+    build();
+  });
+</script>

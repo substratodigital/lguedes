@@ -1,0 +1,50 @@
+---
+import { type Lang, useT } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+
+<section id="newsletter" class="section newsletter">
+  <div class="container newsletter__container" data-reveal>
+    <span class="eyebrow">{t.newsletter.label}</span>
+    <h2 class="h2 newsletter__title">{t.newsletter.h2}</h2>
+    <p class="newsletter__desc">{t.newsletter.p}</p>
+
+    <div class="newsletter__action">
+      <a
+        href="https://www.linkedin.com/newsletters/newsletter-do-guedes-7186097313407258624/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn"
+        id="newsletter-linkedin-btn"
+      >
+        {t.newsletter.cta}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .newsletter {
+    background: var(--bg);
+    text-align: center;
+  }
+  .newsletter__container {
+    max-width: 48rem;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .newsletter__title {
+    margin-bottom: 1.25rem;
+  }
+  .newsletter__desc {
+    font-size: var(--fs-lg);
+    color: var(--ink-2);
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    max-width: 40ch;
+  }
+</style>

@@ -1,0 +1,710 @@
+---
+import { type Lang, useT } from '../i18n';
+import Icon from './Icon.astro';
+import { getPublicacoesData } from '../lib/sanity';
+
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const pub = t.publicacoes;
+
+const {
+  artigos: ARTIGOS_PERIODICOS,
+  congressos: CONGRESSOS,
+  livros: LIVROS,
+  capitulos: CAPITULOS,
+  premios: PREMIOS,
+  midia: MIDIA,
+  artigosOpiniao: ARTIGOS_OPINIAO
+} = await getPublicacoesData();
+
+
+const TABS = [
+  { id: 'cientificas', label: pub.tabs[0], icon: 'BookOpen' as const },
+  { id: 'livros', label: pub.tabs[1], icon: 'BookMarked' as const },
+  { id: 'premios', label: pub.tabs[2], icon: 'Award' as const },
+  { id: 'midia', label: pub.tabs[3], icon: 'Mic' as const },
+  { id: 'academicas', label: pub.tabs[4], icon: 'GraduationCap' as const },
+  { id: 'opiniao', label: pub.tabs[5], icon: 'Newspaper' as const },
+];
+---
+
+<section id="publicacoes" class="section publicacoes">
+  <div class="container">
+    <div class="publicacoes__header" data-reveal>
+      <span class="eyebrow">{pub.label}</span>
+      <h2 class="h2 publicacoes__title">{pub.h2}</h2>
+    </div>
+
+    <!-- Navegação de Abas -->
+    <div class="pub-tabs hide-scrollbar" role="tablist" aria-label="Categorias de Conteúdo" data-reveal>
+      {TABS.map((tab, idx) => (
+        <button
+          type="button"
+          role="tab"
+          class:list={['pub-tab-btn', { 'is-active': idx === 0 }]}
+          id={`tab-btn-${tab.id}`}
+          aria-selected={idx === 0 ? 'true' : 'false'}
+          aria-controls={`tab-panel-${tab.id}`}
+          data-tab-target={tab.id}
+        >
+          <Icon name={tab.icon} size={16} class="pub-tab-btn__icon" />
+          <span class="pub-tab-btn__label">{tab.label}</span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Painéis de Conteúdo -->
+    <div class="pub-panels">
+      <!-- 1. CIENTÍFICAS -->
+      <div id="tab-panel-cientificas" role="tabpanel" class="pub-panel is-active" aria-labelledby="tab-btn-cientificas">
+        <!-- Sub-tabs -->
+        <div class="pub-subtabs">
+          <button type="button" class="pub-subtab-btn is-active" data-subtab-target="artigos">
+            {pub.subtabs[0]}
+          </button>
+          <button type="button" class="pub-subtab-btn" data-subtab-target="congressos">
+            {pub.subtabs[1]}
+          </button>
+        </div>
+
+        <!-- Sub-panel Artigos em Periódicos -->
+        <div id="subpanel-artigos" class="pub-subpanel is-active">
+          <div class="pub-grid" id="artigos-grid">
+            {ARTIGOS_PERIODICOS.map((a, i) => (
+              <div class:list={['pub-card', { 'is-hidden': i >= 6 }]} data-artigo-item>
+                <div class="pub-card__meta">
+                  <span class="pub-card__year font-mono">{a.ano}</span>
+                  {a.url && (
+                    <a href={a.url} target="_blank" rel="noopener noreferrer" class="pub-card__ext" aria-label={`Ler artigo ${a.titulo}`}>
+                      <Icon name="ExternalLink" size={14} />
+                    </a>
+                  )}
+                </div>
+                <h4 class="pub-card__title">{a.titulo}</h4>
+                <p class="pub-card__source font-mono">{a.periodico}</p>
+              </div>
+            ))}
+          </div>
+          {ARTIGOS_PERIODICOS.length > 6 && (
+            <div class="pub-more">
+              <button type="button" class="pub-more-btn" id="btn-toggle-artigos" data-expanded="false">
+                <span class="pub-more-text">{pub.verMais} ({ARTIGOS_PERIODICOS.length - 6})</span>
+                <span class="pub-more-arrow"><Icon name="ChevronDown" size={16} /></span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        <!-- Sub-panel Congressos e Conferências -->
+        <div id="subpanel-congressos" class="pub-subpanel">
+          <div class="pub-table-wrap">
+            <table class="pub-table">
+              <thead>
+                <tr>
+                  <th class="font-mono w-year">{pub.anoLabel}</th>
+                  <th class="font-mono">{pub.tituloLabel}</th>
+                  <th class="font-mono">{pub.eventoLabel}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CONGRESSOS.map((c, i) => (
+                  <tr class:list={[{ 'is-hidden': i >= 8 }]} data-congresso-item>
+                    <td class="font-mono">{c.ano}</td>
+                    <td class="pub-table__title">{c.titulo}</td>
+                    <td class="pub-table__event">{c.evento}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {CONGRESSOS.length > 8 && (
+            <div class="pub-more">
+              <button type="button" class="pub-more-btn" id="btn-toggle-congressos" data-expanded="false">
+                <span class="pub-more-text">{pub.verMais} ({CONGRESSOS.length - 8})</span>
+                <span class="pub-more-arrow"><Icon name="ChevronDown" size={16} /></span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- 2. LIVROS & CAPÍTULOS -->
+      <div id="tab-panel-livros" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-livros">
+        <div class="pub-livros-section">
+          {LIVROS.map((l) => (
+            <div class="featured-book">
+              <div class="featured-book__cover font-pixel">
+                <Icon name="BookMarked" size={36} stroke={1} />
+              </div>
+              <div class="featured-book__info">
+                <div class="pub-card__meta">
+                  <span class="pub-card__badge">{pub.livroLabel}</span>
+                  <span class="pub-card__year font-mono">{l.ano}</span>
+                </div>
+                <h3 class="featured-book__title">{l.titulo}</h3>
+                <p class="featured-book__publisher">{l.editora}</p>
+                {l.url && (
+                  <a href={l.url} target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="margin-top:0.75rem;">
+                    {pub.comprarLabel} <Icon name="ExternalLink" size={14} />
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+
+          <h3 class="pub-section-subtitle font-pixel">{pub.capitulosLabel}</h3>
+          <div class="pub-table-wrap">
+            <table class="pub-table">
+              <thead>
+                <tr>
+                  <th class="font-mono w-year">{pub.anoLabel}</th>
+                  <th class="font-mono">{pub.capituloLabel}</th>
+                  <th class="font-mono">{pub.livroSrcLabel}</th>
+                  <th class="font-mono">{pub.editoraLabel}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CAPITULOS.map((cap) => (
+                  <tr>
+                    <td class="font-mono">{cap.ano}</td>
+                    <td class="pub-table__title">{cap.titulo}</td>
+                    <td class="pub-table__event"><em>{cap.livro}</em></td>
+                    <td class="pub-table__event">{cap.editora}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PRÊMIOS -->
+      <div id="tab-panel-premios" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-premios">
+        <div class="pub-table-wrap">
+          <table class="pub-table">
+            <thead>
+              <tr>
+                <th class="font-mono w-year">{pub.anoLabel}</th>
+                <th class="font-mono">{pub.premioLabel}</th>
+                <th class="font-mono">{pub.concedidoLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PREMIOS.map((p, i) => (
+                <tr class:list={[{ 'is-hidden': i >= 8 }]} data-premio-item>
+                  <td class="font-mono">{p.ano}</td>
+                  <td class="pub-table__title">{p.premio}</td>
+                  <td class="pub-table__event">{p.concedido}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {PREMIOS.length > 8 && (
+          <div class="pub-more">
+            <button type="button" class="pub-more-btn" id="btn-toggle-premios" data-expanded="false">
+              <span class="pub-more-text">{pub.verMais} ({PREMIOS.length - 8})</span>
+              <span class="pub-more-arrow"><Icon name="ChevronDown" size={16} /></span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      <!-- 4. NA MÍDIA -->
+      <div id="tab-panel-midia" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-midia">
+        <div class="pub-grid">
+          {MIDIA.map((m, i) => (
+            <div class:list={['pub-card', { 'is-hidden': i >= 8 }]} data-midia-item>
+              <div class="pub-card__meta">
+                <span class="pub-card__badge">{m.tipo}</span>
+                <span class="pub-card__year font-mono">{m.ano}</span>
+              </div>
+              <h4 class="pub-card__title">{m.titulo}</h4>
+              {m.url && (
+                <a href={m.url} target="_blank" rel="noopener noreferrer" class="pub-card__link">
+                  {pub.acessar} <Icon name="ExternalLink" size={12} />
+                </a>
+              )}
+            </div>
+          ))}
+        </div>
+        {MIDIA.length > 8 && (
+          <div class="pub-more">
+            <button type="button" class="pub-more-btn" id="btn-toggle-midia" data-expanded="false">
+              <span class="pub-more-text">{pub.verMais} ({MIDIA.length - 8})</span>
+              <span class="pub-more-arrow"><Icon name="ChevronDown" size={16} /></span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      <!-- 5. ATIVIDADES ACADÊMICAS -->
+      <div id="tab-panel-academicas" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-academicas">
+        <div class="academic-list">
+          {pub.atividades.map((item: string) => (
+            <div class="academic-item">
+              <div class="academic-item__icon"><Icon name="GraduationCap" size={15} /></div>
+              <p class="academic-item__text">{item}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- 6. ARTIGOS DE OPINIÃO -->
+      <div id="tab-panel-opiniao" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-opiniao">
+        <p class="pub-opiniao-desc font-mono">{pub.opiniaoSource}</p>
+        <div class="pub-table-wrap">
+          <table class="pub-table">
+            <thead>
+              <tr>
+                <th class="font-mono w-year">#</th>
+                <th class="font-mono">{pub.tituloLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ARTIGOS_OPINIAO.map((tit, i) => (
+                <tr class:list={[{ 'is-hidden': i >= 12 }]} data-opiniao-item>
+                  <td class="font-mono text-muted">{String(i + 1).padStart(2, '0')}</td>
+                  <td class="pub-table__title">{tit}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {ARTIGOS_OPINIAO.length > 12 && (
+          <div class="pub-more">
+            <button type="button" class="pub-more-btn" id="btn-toggle-opiniao" data-expanded="false">
+              <span class="pub-more-text">{pub.verMais} ({ARTIGOS_OPINIAO.length - 12})</span>
+              <span class="pub-more-arrow"><Icon name="ChevronDown" size={16} /></span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .publicacoes {
+    background: var(--bg-soft);
+    border-top: 1px solid var(--line);
+  }
+  .publicacoes__header {
+    margin-bottom: 2.5rem;
+  }
+
+  /* Abas principais */
+  .pub-tabs {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.75rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .pub-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    white-space: nowrap;
+    transition: all 0.2s var(--ease-out);
+  }
+  .pub-tab-btn:hover {
+    color: var(--ink);
+    border-color: var(--line-strong);
+  }
+  .pub-tab-btn.is-active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  /* Sub-tabs */
+  .pub-subtabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .pub-subtab-btn {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--ink-3);
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .pub-subtab-btn:hover {
+    color: var(--ink);
+  }
+  .pub-subtab-btn.is-active {
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: hsl(243 75% 59% / 0.25);
+  }
+
+  /* Painéis */
+  .pub-panel {
+    display: none;
+  }
+  .pub-panel.is-active {
+    display: block;
+  }
+  .pub-subpanel {
+    display: none;
+  }
+  .pub-subpanel.is-active {
+    display: block;
+  }
+
+  /* Grid de Cards */
+  .pub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+  }
+  .pub-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .pub-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+  .pub-card.is-hidden {
+    display: none;
+  }
+
+  .pub-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .pub-card__year {
+    font-size: var(--fs-xs);
+    color: var(--ink-3);
+    font-weight: 700;
+  }
+  .pub-card__ext {
+    font-size: 1rem;
+    color: var(--primary);
+    font-weight: 700;
+  }
+  .pub-card__badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+    background: var(--bg-soft);
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+  }
+  .pub-card__title {
+    font-size: 0.975rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .pub-card__source {
+    font-size: 0.775rem;
+    color: var(--primary);
+    margin-top: auto;
+  }
+  .pub-card__link {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: auto;
+  }
+
+  /* Tabelas */
+  .pub-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+  }
+  .pub-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-sm);
+    text-align: left;
+  }
+  .pub-table th {
+    padding: 1rem 1.25rem;
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-3);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .pub-table td {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .pub-table tr:last-child td {
+    border-bottom: none;
+  }
+  .pub-table tr.is-hidden {
+    display: none;
+  }
+  .pub-table tr:hover td {
+    background: hsl(240 20% 98%);
+  }
+  .w-year {
+    width: 5.5rem;
+  }
+  .pub-table__title {
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .pub-table__event {
+    color: var(--ink-2);
+    font-size: 0.825rem;
+    line-height: 1.4;
+  }
+  .text-muted {
+    color: var(--ink-3);
+  }
+
+  /* Livro Destaque */
+  .pub-livros-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+  .featured-book {
+    display: flex;
+    gap: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    align-items: center;
+  }
+  .featured-book__cover {
+    width: 130px;
+    height: 170px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+  }
+  .featured-book__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-block: 0.5rem 0.25rem;
+  }
+  .featured-book__publisher {
+    color: var(--ink-2);
+    font-size: 0.95rem;
+  }
+  .pub-section-subtitle {
+    font-size: 0.95rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+
+  /* Atividades Acadêmicas */
+  .academic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 52rem;
+  }
+  .academic-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem 2rem;
+  }
+  .academic-item__icon {
+    color: var(--primary);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .academic-item__text {
+    font-size: 1rem;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  /* Artigos de Opinião */
+  .pub-opiniao-desc {
+    color: var(--ink-3);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Botão Ver Mais */
+  .pub-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  .pub-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--primary);
+    border: 1px solid hsl(243 75% 59% / 0.3);
+    padding: 0.55rem 1.4rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    transition: all 0.2s;
+  }
+  .pub-more-btn:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 640px) {
+    .featured-book {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  .pub-tab-btn :global(.pub-tab-btn__icon) { color: var(--ink-3); transition: color .2s; }
+  .pub-tab-btn.is-active :global(.pub-tab-btn__icon) { color: #a5b4fc; }
+  .pub-card__ext { display: inline-flex; color: var(--ink-3); transition: color .2s; }
+  .pub-card:hover .pub-card__ext { color: var(--primary); }
+  .pub-card__link, .featured-book a { display: inline-flex; align-items: center; gap: .35rem; }
+  .pub-more-arrow { display: inline-flex; transition: transform .35s var(--ease-out); }
+  .pub-more-btn[data-expanded="true"] .pub-more-arrow { transform: rotate(180deg); }
+  .academic-item__icon { width: 2rem; height: 2rem; border-radius: 50%; border: 1px solid hsl(243 75% 59% / .3); display: grid; place-items: center; margin-top: 0; }
+  .featured-book__cover { color: #fff; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  const reducedPub = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** Anima a entrada dos itens de um painel (cards, linhas de tabela, blocos) */
+  function animateIn(root: Element | null, onlyEls?: Element[]) {
+    if (!root || reducedPub) return;
+    const els = onlyEls ?? Array.from(root.querySelectorAll(
+      '.pub-subtabs, .pub-card:not(.is-hidden), .pub-table-wrap, .pub-table tbody tr:not(.is-hidden), .featured-book, .pub-section-subtitle, .academic-item, .pub-opiniao-desc, .pub-more'
+    )).filter((el) => (el as HTMLElement).offsetParent !== null);
+    gsap.fromTo(els, { autoAlpha: 0, y: 16 }, {
+      autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out',
+      stagger: { each: 0.035, from: 'start' }, overwrite: true, clearProps: 'transform',
+    });
+  }
+  // Entrada inicial quando a seção aparece
+  const pubSection = document.getElementById('publicacoes');
+  if (pubSection && !reducedPub) {
+    new IntersectionObserver(([e], o) => {
+      if (!e.isIntersecting) return; o.disconnect();
+      animateIn(document.querySelector('.pub-panel.is-active'));
+    }, { threshold: 0.1 }).observe(pubSection.querySelector('.pub-panels')!);
+  }
+  // Controle de abas principais
+  const tabBtns = document.querySelectorAll<HTMLButtonElement>('[data-tab-target]');
+  const panels = document.querySelectorAll<HTMLElement>('.pub-panel');
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-tab-target');
+      tabBtns.forEach((b) => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      panels.forEach((p) => p.classList.remove('is-active'));
+
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-selected', 'true');
+      const panel = document.getElementById(`tab-panel-${target}`);
+      panel?.classList.add('is-active');
+      animateIn(panel);
+    });
+  });
+
+  // Controle de sub-abas (Artigos / Congressos)
+  const subBtns = document.querySelectorAll<HTMLButtonElement>('[data-subtab-target]');
+  const subpanels = document.querySelectorAll<HTMLElement>('.pub-subpanel');
+
+  subBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-subtab-target');
+      subBtns.forEach((b) => b.classList.remove('is-active'));
+      subpanels.forEach((p) => p.classList.remove('is-active'));
+
+      btn.classList.add('is-active');
+      const sp = document.getElementById(`subpanel-${target}`);
+      sp?.classList.add('is-active');
+      animateIn(sp);
+    });
+  });
+
+  // Ver mais genérico
+  function setupExpandToggle(btnId: string, itemSelector: string, baseCount: number, labelMais: string, labelMenos: string) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    const items = document.querySelectorAll<HTMLElement>(itemSelector);
+
+    btn.addEventListener('click', () => {
+      const isExpanded = btn.getAttribute('data-expanded') === 'true';
+      const nextExpanded = !isExpanded;
+      btn.setAttribute('data-expanded', String(nextExpanded));
+
+      const revealed: Element[] = [];
+      items.forEach((item, idx) => {
+        if (idx >= baseCount) {
+          item.classList.toggle('is-hidden', !nextExpanded);
+          if (nextExpanded) revealed.push(item);
+        }
+      });
+      if (nextExpanded) animateIn(btn.closest('.pub-panel, .pub-subpanel'), revealed);
+
+      const textEl = btn.querySelector('.pub-more-text');
+      if (textEl) {
+        textEl.textContent = nextExpanded ? labelMenos : `${labelMais} (${items.length - baseCount})`;
+      }
+    });
+  }
+
+  setupExpandToggle('btn-toggle-artigos', '[data-artigo-item]', 6, 'Ver mais', 'Ver menos');
+  setupExpandToggle('btn-toggle-congressos', '[data-congresso-item]', 8, 'Ver mais', 'Ver menos');
+  setupExpandToggle('btn-toggle-premios', '[data-premio-item]', 8, 'Ver mais', 'Ver menos');
+  setupExpandToggle('btn-toggle-midia', '[data-midia-item]', 8, 'Ver mais', 'Ver menos');
+  setupExpandToggle('btn-toggle-opiniao', '[data-opiniao-item]', 12, 'Ver mais', 'Ver menos');
+</script>

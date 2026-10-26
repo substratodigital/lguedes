@@ -11,6 +11,18 @@ out-tsc
 # dependencies
 node_modules
 
+# Astro & Environment
+.astro/
+.env
+.env.local
+.env.*.local
+
+# Raw Media & Video renders (heavy files)
+MOTIONS_SOCIAL/
+FOTOS GUEDES/
+
+
+
 # IDEs and editors
 /.idea
 .project

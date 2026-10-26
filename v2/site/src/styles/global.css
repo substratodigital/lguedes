@@ -1,0 +1,164 @@
+/* ==========================================================================
+   Guedes.AI — Design System V2 (light only, CSS puro, sem Tailwind)
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/GeistSans-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GeistMono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'GeistPixel';
+  src: url('/fonts/GeistPixel.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* ── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  /* Cores base */
+  --bg:            hsl(240 20% 99%);
+  --bg-soft:       hsl(240 18% 96.5%);
+  --surface:       hsl(0 0% 100%);
+  --ink:           hsl(240 18% 10%);
+  --ink-2:         hsl(240 8% 32%);
+  --ink-3:         hsl(240 5% 50%);
+  --line:          hsl(240 10% 90%);
+  --line-strong:   hsl(240 8% 82%);
+
+  /* Marca */
+  --primary:       hsl(243 75% 59%);   /* #4F46E5 ~ indigo */
+  --primary-600:   hsl(243 70% 52%);
+  --primary-soft:  hsl(243 90% 96%);
+  --violet:        hsl(258 90% 66%);   /* #8B5CF6 */
+  --teal:          hsl(172 66% 40%);
+
+  /* Tipografia */
+  --font-sans:  'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono:  'GeistMono', ui-monospace, monospace;
+  --font-pixel: 'GeistPixel', 'GeistMono', monospace;
+
+  --fs-xs:   0.6875rem;  /* 11 */
+  --fs-sm:   0.8125rem;  /* 13 */
+  --fs-base: 1rem;
+  --fs-lg:   clamp(1.05rem, 0.95rem + 0.4vw, 1.25rem);
+  --fs-h2:   clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+  --fs-hero: clamp(3.25rem, 1.5rem + 8vw, 8rem);
+
+  /* Espaço / forma */
+  --container: 80rem;
+  --gutter:    clamp(1.25rem, 4vw, 2.5rem);
+  --radius-sm: 0.5rem;
+  --radius:    0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 1px 2px hsl(240 30% 20% / 0.06);
+  --shadow:    0 8px 30px -12px hsl(240 40% 20% / 0.18);
+  --shadow-primary: 0 12px 32px -10px hsl(243 75% 59% / 0.45);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --nav-h: 4.5rem;
+}
+
+/* ── Reset enxuto ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--nav-h); }
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+img, svg, canvas, video { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; }
+a { color: inherit; text-decoration: none; }
+::selection { background: hsl(243 75% 59% / 0.18); }
+
+/* ── Utilidades ─────────────────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section { position: relative; padding-block: clamp(4.5rem, 10vw, 8rem); }
+.font-pixel { font-family: var(--font-pixel); font-weight: 400; }
+.font-mono  { font-family: var(--font-mono); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+.h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+/* Dot grid de fundo (sutil, estático — custo zero) */
+.dot-grid {
+  background-image: radial-gradient(circle, hsl(240 20% 20% / 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── Botões ─────────────────────────────────────────────────────────────── */
+.btn {
+  --btn-bg: var(--primary);
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+  height: 3.25rem; padding-inline: 1.75rem;
+  border-radius: var(--radius-pill);
+  background: var(--btn-bg);
+  color: #fff;
+  font-weight: 600; font-size: 0.95rem;
+  box-shadow: var(--shadow-primary);
+  transition: transform .35s var(--ease-out), background-color .25s, box-shadow .35s var(--ease-out);
+  will-change: transform;
+}
+.btn:hover { background: var(--primary-600); transform: translateY(-2px); box-shadow: 0 18px 40px -12px hsl(243 75% 59% / .55); }
+.btn:active { transform: translateY(0) scale(.98); }
+.btn svg { width: 1.1em; height: 1.1em; transition: transform .35s var(--ease-out); }
+.btn:hover svg { transform: translateX(3px); }
+.btn:focus-visible, .icon-btn:focus-visible, a:focus-visible {
+  outline: 2px solid var(--primary); outline-offset: 3px;
+}
+
+.btn-sm { height: 2.4rem; padding-inline: 1.1rem; font-size: var(--fs-sm); font-weight: 500; box-shadow: none; }
+
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2.4rem; height: 2.4rem; border-radius: var(--radius-pill);
+  border: 1px solid var(--line); color: var(--ink-2);
+  transition: color .2s, border-color .2s, background-color .2s;
+}
+.icon-btn:hover { color: var(--primary); border-color: hsl(243 75% 59% / .35); background: var(--primary-soft); }
+.icon-btn svg { width: 1rem; height: 1rem; }
+
+/* ── Estado inicial p/ animações GSAP (evita flash) ─────────────────────── */
+.js [data-reveal] { opacity: 0; transform: translateY(24px); }
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] { opacity: 1 !important; transform: none !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

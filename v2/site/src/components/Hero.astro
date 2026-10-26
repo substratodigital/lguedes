@@ -1,0 +1,191 @@
+---
+import { type Lang, useT } from '../i18n';
+import Icon from './Icon.astro';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const name = 'Luís Guedes';
+---
+<section class="hero dot-grid" id="hero" aria-labelledby="hero-title">
+  <div class="hero__stage" data-hero-stage>
+    <canvas class="hero__canvas" id="hero-canvas" aria-hidden="true"></canvas>
+    <img class="hero__fallback" src="/img/guedes_ai_grande.webp" alt="" width="684" height="800" loading="eager" decoding="async" />
+  </div>
+
+  <div class="hero__fade" aria-hidden="true"></div>
+
+  <div class="container hero__content" data-hero-content>
+    <p class="hero__badge" data-hero-in>
+      <span class="hero__dot" aria-hidden="true"></span>
+      {t.hero.badge}
+    </p>
+
+    <h1 class="hero__title font-pixel" id="hero-title" aria-label={name}>
+      {name.split('').map((ch) => (
+        <span class="hero__char" aria-hidden="true">{ch === ' ' ? '\u00A0' : ch}</span>
+      ))}
+    </h1>
+
+    <p class="hero__sub" data-hero-in>{t.hero.p}</p>
+
+    <div class="hero__ctas" data-hero-in>
+      <a href="#palestras" class="btn" id="hero-cta-palestras">
+        {t.hero.cta2}
+        <Icon name="ArrowRight" size={18} stroke={2} />
+      </a>
+      <a href="#contato" class="hero__link" id="hero-cta-contato">{t.hero.cta1}</a>
+    </div>
+
+    <ul class="hero__stats font-mono" data-hero-in>
+      {t.hero.stats.map((s) => <li>{s}</li>)}
+    </ul>
+  </div>
+
+  <a href="#clientes" class="hero__scroll font-mono" aria-label="Rolar para o conteúdo" data-hero-in>
+    <span>scroll</span><i aria-hidden="true"></i>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    isolation: isolate;
+    background-color: var(--bg);
+  }
+  /* brilho índigo muito sutil atrás do retrato (estático, sem blur animado) */
+  .hero::before {
+    content: ''; position: absolute; z-index: -1;
+    width: 60vmax; height: 60vmax; right: -10vmax; top: 5%;
+    background: radial-gradient(closest-side, hsl(243 90% 92% / .9), transparent 70%);
+  }
+  .hero__stage { position: absolute; inset: 0; z-index: 0; }
+  .hero__canvas { width: 100%; height: 100%; }
+  .hero__fallback {
+    display: none; position: absolute; bottom: 0; right: 8%; height: 92%; width: auto;
+    filter: grayscale(1) contrast(1.15); mix-blend-mode: multiply; opacity: .9;
+  }
+  :global(.no-webgl) .hero__fallback { display: block; }
+  :global(.no-webgl) .hero__canvas { display: none; }
+
+  .hero__fade {
+    position: absolute; inset: auto 0 0; height: 22vh; z-index: 1; pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+  }
+
+  .hero__content {
+    position: relative; z-index: 2;
+    padding-top: calc(var(--nav-h) + 2rem);
+    padding-bottom: clamp(3.5rem, 9vh, 6rem);
+    pointer-events: none;
+  }
+  .hero__content a { pointer-events: auto; }
+
+  .hero__badge {
+    display: inline-flex; align-items: center; gap: .55rem;
+    font-family: var(--font-pixel); font-size: var(--fs-xs);
+    letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2);
+    padding: .45rem 1rem; border-radius: var(--radius-pill);
+    background: hsl(0 0% 100% / .7); border: 1px solid var(--line);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    margin-bottom: 1.1rem;
+  }
+  .hero__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px hsl(243 75% 59% / .15); }
+
+  .hero__title {
+    font-size: var(--fs-hero);
+    line-height: .95;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    white-space: nowrap;
+  }
+  .hero__char { display: inline-block; will-change: transform; }
+
+  .hero__sub {
+    font-size: var(--fs-lg); color: var(--ink-2); font-weight: 500;
+    max-width: 26ch; white-space: pre-line; line-height: 1.35;
+    margin-bottom: 2rem;
+  }
+  .hero__ctas { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .hero__link {
+    font-size: .9rem; font-weight: 600; color: var(--ink);
+    background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
+    padding-bottom: 2px; transition: background-size .4s var(--ease-out), color .2s;
+  }
+  .hero__link:hover { color: var(--primary); background-size: 0 1px; background-position: 100% 100%; }
+
+  .hero__stats { display: flex; gap: 1.75rem; list-style: none; font-size: var(--fs-xs); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .hero__stats li { position: relative; }
+  .hero__stats li + li::before { content: ''; position: absolute; left: -0.9rem; top: 50%; width: 3px; height: 3px; background: var(--line-strong); border-radius: 50%; }
+
+  .hero__scroll {
+    position: absolute; z-index: 2; right: var(--gutter); bottom: 2rem;
+    display: none; align-items: center; gap: .75rem;
+    font-size: var(--fs-xs); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-3);
+    writing-mode: vertical-rl;
+  }
+  .hero__scroll i { width: 1px; height: 48px; background: linear-gradient(var(--ink-3), transparent); animation: scrollcue 2.2s var(--ease-out) infinite; transform-origin: top; }
+  @keyframes scrollcue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* Mobile: retrato em cima, texto embaixo */
+  @media (max-width: 767px) {
+    .hero__content { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .hero__title { font-size: clamp(3rem, 15vw, 4.5rem); }
+    .hero__ctas { justify-content: center; }
+    .hero__stats { justify-content: center; gap: 1.25rem; }
+    .hero__sub { margin-inline: auto; }
+    .hero__fallback { right: 50%; transform: translateX(50%); height: 60%; top: 6%; bottom: auto; }
+  }
+  @media (min-width: 1024px) { .hero__scroll { display: inline-flex; } }
+
+  /* Estado inicial (antes do GSAP) */
+  :global(.js) .hero [data-hero-in] { opacity: 0; }
+  :global(.js) .hero__char { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .hero [data-hero-in], :global(.js) .hero__char { opacity: 1; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { initHeroAscii } from '../scripts/hero-ascii';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement;
+  const hero = document.getElementById('hero')!;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.1 });
+  tl.to('.hero__badge', { opacity: 1, y: 0, duration: 0.6, startAt: { y: -10 } })
+    .to('.hero__char', { opacity: 1, y: 0, duration: 0.7, stagger: 0.035, startAt: { y: 28 } }, '-=0.35')
+    .to('.hero__sub', { opacity: 1, y: 0, duration: 0.6, startAt: { y: 14 } }, '-=0.45')
+    .to('.hero__ctas, .hero__stats, .hero__scroll', { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, startAt: { y: 12 } }, '-=0.4');
+  if (reduced) tl.progress(1);
+
+  initHeroAscii(canvas, { src: '/img/guedes_ai_grande.webp', anchorX: 0.68 })
+    .then((fx) => {
+      if (!fx) { hero.classList.add('no-webgl'); return; }
+      if (fx.reduced) return;
+      const p = { v: 0 };
+      gsap.to(p, { v: 1, duration: 2.4, ease: 'power2.inOut', onUpdate: () => fx.setReveal(p.v) });
+    })
+    .catch(() => hero.classList.add('no-webgl'));
+
+  // Saída suave ao rolar (apenas transform/opacity → compositor)
+  if (!reduced) {
+    gsap.to('[data-hero-content]', {
+      yPercent: -12, opacity: 0.2, ease: 'none',
+      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
+    });
+    gsap.to('[data-hero-stage]', {
+      yPercent: 8, ease: 'none',
+      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true },
+    });
+  }
+</script>

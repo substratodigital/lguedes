@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Clientes from '../components/Clientes.astro';
+import Bio from '../components/Bio.astro';
+import Palestras from '../components/Palestras.astro';
+import Trajetoria from '../components/Trajetoria.astro';
+import Publicacoes from '../components/Publicacoes.astro';
+import Solucoes from '../components/Solucoes.astro';
+import Depoimentos from '../components/Depoimentos.astro';
+import Newsletter from '../components/Newsletter.astro';
+import ContatoFooter from '../components/ContatoFooter.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import { useT } from '../i18n';
+
+const t = useT('pt');
+---
+
+<Base
+  lang="pt"
+  title="Luís Guedes — Pós-Doutor em IA pela FEA/USP | Palestrante e Consultor"
+  description="Especialista em estratégia, inovação e ESG. Pós-doutor em IA pela FEA/USP, professor premiado com mais de 30 anos de mercado."
+>
+  <Nav lang="pt" />
+  <main id="main-content">
+    <Hero lang="pt" />
+    <Clientes lang="pt" />
+    <Bio lang="pt" />
+    <Palestras lang="pt" />
+    <Trajetoria lang="pt" />
+    <Publicacoes lang="pt" />
+    <Solucoes lang="pt" />
+    <Depoimentos lang="pt" />
+    <Newsletter lang="pt" />
+  </main>
+  <ContatoFooter lang="pt" />
+  <WhatsAppButton />
+</Base>

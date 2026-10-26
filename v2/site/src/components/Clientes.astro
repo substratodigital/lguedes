@@ -1,0 +1,135 @@
+---
+import { type Lang, useT } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+
+const row1 = ["Bunge", "CCR", "FIESP", "Firjan SENAI", "Itaú Social", "LHH", "Mahle", "MedMax", "Swisscam"];
+const row2 = ["Google", "CONARH ABRH", "IT Forum", "Prefeitura SP", "FUNASA", "SERPRO", "Porto de Santos", "ALESP", "Nile University", "Pacto Global"];
+---
+
+<section id="clientes" class="section clientes">
+  <div class="container" data-reveal>
+    <span class="eyebrow">{t.clientes.label}</span>
+    <h2 class="h2 clientes__title">{t.clientes.h2}</h2>
+    <p class="clientes__desc">{t.clientes.countries}</p>
+  </div>
+
+  <div class="marquee-track-wrapper">
+    <div class="marquee-fade marquee-fade--left" aria-hidden="true"></div>
+    <div class="marquee-fade marquee-fade--right" aria-hidden="true"></div>
+
+    <div class="marquee">
+      <div class="marquee__inner marquee__inner--normal">
+        {[...row1, ...row1, ...row1, ...row1].map((client) => (
+          <div class="marquee__item">
+            <span>{client}</span>
+            <span class="marquee__sep">/</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="marquee">
+      <div class="marquee__inner marquee__inner--reverse">
+        {[...row2, ...row2, ...row2, ...row2].map((client) => (
+          <div class="marquee__item">
+            <span>{client}</span>
+            <span class="marquee__sep">/</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .clientes {
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .clientes__title {
+    max-width: 24ch;
+    margin-bottom: 0.75rem;
+  }
+  .clientes__desc {
+    color: var(--ink-3);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    margin-bottom: 3.5rem;
+  }
+
+  .marquee-track-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .marquee-fade {
+    position: absolute;
+    inset-block: 0;
+    width: clamp(2rem, 8vw, 8rem);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .marquee-fade--left {
+    left: 0;
+    background: linear-gradient(to right, var(--bg), transparent);
+  }
+  .marquee-fade--right {
+    right: 0;
+    background: linear-gradient(to left, var(--bg), transparent);
+  }
+
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+  }
+  .marquee__inner {
+    display: flex;
+    flex-shrink: 0;
+    will-change: transform;
+  }
+  .marquee__inner--normal {
+    animation: marquee-scroll 32s linear infinite;
+  }
+  .marquee__inner--reverse {
+    animation: marquee-scroll 36s linear infinite reverse;
+  }
+  .marquee:hover .marquee__inner {
+    animation-play-state: paused;
+  }
+
+  .marquee__item {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding-inline: 1rem;
+    font-size: var(--fs-base);
+    font-weight: 500;
+    color: var(--ink-2);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .marquee__item:hover {
+    color: var(--ink);
+  }
+  .marquee__sep {
+    color: var(--line-strong);
+    font-size: var(--fs-sm);
+  }
+
+  @keyframes marquee-scroll {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__inner--normal,
+    .marquee__inner--reverse {
+      animation: none;
+    }
+  }
+</style>

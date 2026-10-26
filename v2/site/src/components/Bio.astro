@@ -1,0 +1,193 @@
+---
+import { type Lang, useT } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+---
+
+<section id="trajetoria" class="section bio">
+  <div class="container bio__container">
+    <div data-reveal>
+      <span class="eyebrow">{t.bio.label}</span>
+      <h2 class="h2 bio__title">{t.bio.h2}</h2>
+
+      <div class="bio__pills">
+        {t.bio.pills.map((pill: string) => (
+          <span class="bio__pill">{pill}</span>
+        ))}
+      </div>
+
+      <div class="bio__text">
+        <p>{t.bio.p}</p>
+      </div>
+
+      <div class="bio__action">
+        <button type="button" class="bio__modal-trigger" id="open-bio-modal">
+          + BIO COMPLETA
+        </button>
+      </div>
+
+      <blockquote class="bio__quote">
+        <p>"{t.bio.quote}"</p>
+      </blockquote>
+    </div>
+  </div>
+
+  <!-- Dialog Nativo HTML5: 0 bytes de JS externo, 100% acessível -->
+  <dialog id="bio-modal" class="bio-dialog" aria-labelledby="bio-dialog-title">
+    <div class="bio-dialog__box">
+      <div class="bio-dialog__head">
+        <h3 id="bio-dialog-title" class="bio-dialog__title">Luís Guedes, PhD</h3>
+        <button type="button" class="bio-dialog__close" id="close-bio-modal" aria-label="Fechar modal">✕</button>
+      </div>
+      <div class="bio-dialog__body">
+        {t.bio.fullBio.split('\n\n').map((paragraph: string) => (
+          <p>{paragraph}</p>
+        ))}
+      </div>
+    </div>
+  </dialog>
+</section>
+
+<style>
+  .bio {
+    background: var(--bg);
+  }
+  .bio__container {
+    max-width: 54rem;
+  }
+  .bio__title {
+    max-width: 22ch;
+    margin-bottom: 1.5rem;
+  }
+  .bio__pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 2.25rem;
+  }
+  .bio__pill {
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+    background: hsl(0 0% 100% / 0.6);
+    padding: 0.35rem 0.9rem;
+    border-radius: var(--radius-pill);
+  }
+  .bio__text {
+    font-size: var(--fs-lg);
+    line-height: 1.65;
+    color: var(--ink-2);
+    margin-bottom: 2rem;
+  }
+  .bio__action {
+    margin-bottom: 2.75rem;
+  }
+  .bio__modal-trigger {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--primary);
+    border: 1px solid hsl(243 75% 59% / 0.3);
+    background: transparent;
+    padding: 0.55rem 1.25rem;
+    border-radius: var(--radius-pill);
+    transition: all 0.25s var(--ease-out);
+  }
+  .bio__modal-trigger:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+  .bio__quote {
+    border-left: 3px solid var(--primary);
+    padding-left: 1.75rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+    color: var(--ink);
+    line-height: 1.35;
+  }
+
+  /* HTML5 Dialog */
+  .bio-dialog {
+    margin: auto;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: transparent;
+    max-width: min(42rem, 90vw);
+    max-height: 85vh;
+    padding: 0;
+    box-shadow: var(--shadow);
+  }
+  .bio-dialog::backdrop {
+    background: hsl(240 18% 10% / 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .bio-dialog__box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+  }
+  .bio-dialog__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .bio-dialog__title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .bio-dialog__close {
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+  .bio-dialog__close:hover {
+    background: var(--bg-soft);
+    color: var(--ink);
+  }
+  .bio-dialog__body {
+    padding: 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    color: var(--ink-2);
+    line-height: 1.7;
+    font-size: 0.95rem;
+  }
+</style>
+
+<script>
+  const modal = document.getElementById('bio-modal') as HTMLDialogElement;
+  const openBtn = document.getElementById('open-bio-modal');
+  const closeBtn = document.getElementById('close-bio-modal');
+
+  if (modal && openBtn && closeBtn) {
+    openBtn.addEventListener('click', () => modal.showModal());
+    closeBtn.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (e) => {
+      const rect = modal.getBoundingClientRect();
+      const inDialog =
+        rect.top <= e.clientY &&
+        e.clientY <= rect.top + rect.height &&
+        rect.left <= e.clientX &&
+        e.clientX <= rect.left + rect.width;
+      if (!inDialog) modal.close();
+    });
+  }
+</script>
