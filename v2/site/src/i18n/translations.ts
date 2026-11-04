@@ -14,7 +14,7 @@ export const translations = {
     hero: {
       badge: "Pós-Doutor em IA pela FEA/USP",
       h2: "IA e Inovação para o Futuro",
-      p: "Especialista em estratégia,\ninovação e ESG",
+      p: "Especialista em estratégia, inovação e ESG",
       cta1: "Agendar Palestra",
       cta2: "Palestras",
       stats: ["100+ Palestras", "30+ Anos", "5 países"],
