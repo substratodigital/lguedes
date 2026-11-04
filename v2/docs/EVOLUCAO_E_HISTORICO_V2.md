@@ -100,9 +100,9 @@ Criadas as rotas estáticas em PT e EN destrinchando todas as 15 soluções do P
 | Item | Regra |
 |---|---|
 | **Deploy** | Cloudflare Pages automático via push na branch `main` do repositório `substratodigital/lguedes`. |
-| **Build** | Sempre rodar `cd site; npm.cmd run build` antes de qualquer commit. O build estático deve gerar 6 rotas sem erros. |
+| **Build** | Sempre rodar `cd site; npm.cmd run build` antes de qualquer commit. O build estático deve gerar 8 rotas sem erros (`/`, `/en/`, 4 ofertas de consultoria, `/links` e `/bio`). |
 | **PowerShell** | Usar sempre **`npm.cmd`** (o PowerShell bloqueia scripts `.ps1` por padrão). |
-| **Sanity CMS** | Restrito **exclusivamente à seção de artigos/publicações** (`Publicacoes.astro`). Possui fallback estático em `src/data/publicacoes.ts` que nunca deve ser quebrado. Nunca commitar pasta `cms/.sanity/`. |
+| **Sanity CMS** | Usado para artigos/publicações (`Publicacoes.astro`) e links da bio do Instagram (`links.astro` via tipo `linkBio`). Possui fallbacks estáticos em `src/data/publicacoes.ts` e `src/data/links.ts` que nunca devem ser quebrados. Nunca commitar pasta `cms/.sanity/`. |
 | **Assets brutos** | Pastas `fotosbrutas/` e `referencias/` não são versionadas. |
 
 ---
