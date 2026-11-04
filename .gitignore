@@ -22,11 +22,11 @@ MOTIONS_SOCIAL/
 FOTOS GUEDES/
 
 # Legacy V1 folders & Reference Assets
-artifacts/
-attached_assets/
-lib/
-scripts/
-skills/
+/artifacts/
+/attached_assets/
+/lib/
+/scripts/
+/skills/
 
 
 
@@ -67,3 +67,12 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Ignored raw and cms cache
+fotosbrutas/
+referencias/
+v2/fotosbrutas/
+v2/referencias/
+.sanity/
+cms/.sanity/
+v2/cms/.sanity/

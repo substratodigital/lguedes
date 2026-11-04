@@ -64,6 +64,15 @@ Criadas as rotas estáticas em PT e EN destrinchando todas as 15 soluções do P
 - Removido efeito ASCII e máscara circular de hover do retrato; mantida a foto oficial do professor grande (`/img/guedes-formal.webp`) com acabamento nítido e elegante.
 - Removidas as linhas divisórias cinzas horizontais.
 
+### 1.8 Página de Links da Bio / Instagram (`/links` e `/bio`)
+- Criada página mobile-first oculta da navegação geral para atuar como Linktree oficial no Instagram do professor (`lguedes.com.br/links` e rota de redirecionamento `/bio`).
+- **Design:** inspirado na referência premium (Itaú Design), alinhado ao Tech Editorial do Guedes.AI. Avatar em alta resolução com selo de verificação, badge de status pulsante ("Pós-Doutor em IA · FEA/USP"), mini bio executiva e barra rápida de redes sociais (LinkedIn, WhatsApp, Site, E-mail).
+- **Cards de Links:** suportam miniaturas fotográficas ou ícones temáticos por categoria (`Artigo`, `Consultoria`, `Palestra`, `Newsletter`, `WhatsApp`, `Geral`), badge de destaque ("NOVO", "DESTAQUE"), título, descrição e indicador de navegação externa. Cards com `destaque: true` ganham borda e gradiente sutil.
+- **Integração Sanity CMS (`linkBio`):**
+  - Schema completo adicionado ao Studio (`cms/schemas.ts`), permitindo adicionar, ordenar, pausar (`ativo`) ou destacar links visualmente.
+  - Integração robusta em `site/src/lib/sanity.ts` com fallback estático em `site/src/data/links.ts`.
+  - Revalidação instantânea no cliente via Sanity CDN: quando o professor altera ou adiciona links no Studio, as mudanças refletem imediatamente para quem acessa pelo celular no Instagram, sem depender de novo deploy na Cloudflare Pages.
+
 ---
 
 ## 2. Regras Fundamentais de Design System Consolidadas
@@ -107,3 +116,4 @@ Criadas as rotas estáticas em PT e EN destrinchando todas as 15 soluções do P
    - Conferir se o webhook/endpoint de envio de e-mail do formulário de contato (`cf-form`) está configurado no ambiente de produção da Cloudflare.
 3. **SEO & Metadados:**
    - Avaliar a inclusão de OpenGraph tags customizadas para as 4 novas páginas de consultoria.
+

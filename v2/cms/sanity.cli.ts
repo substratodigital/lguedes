@@ -4,5 +4,6 @@ export default defineCliConfig({
   api: {
     projectId: '84rosfy5',
     dataset: 'production'
-  }
+  },
+  studioHost: 'guedes-ai'
 });

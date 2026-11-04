@@ -13,9 +13,11 @@
 | Produção | https://www.lguedes.com.br |
 
 ### Escopo do Sanity (IMPORTANTE)
-- O Sanity é usado **somente para a seção de artigos/publicações** (`site/src/components/Publicacoes.astro`).
-- Integração em `site/src/lib/sanity.ts` → `getPublicacoesData()`. Tipos: `artigoPeriodico`, `congresso`, `livro`, `capitulo`, `premio`, `midia`, `artigoOpiniao` (schemas em `cms/schemas.ts`).
-- Se o Sanity falhar ou vier vazio, o site usa o fallback estático de `site/src/data/publicacoes.ts`. **Não quebrar esse fallback.**
+- O Sanity é usado para:
+  1. **Seção de artigos/publicações** (`site/src/components/Publicacoes.astro` via `getPublicacoesData()`). Tipos: `artigoPeriodico`, `congresso`, `livro`, `capitulo`, `premio`, `midia`, `artigoOpiniao`.
+  2. **Página de links da bio do Instagram** (`/links` e redirect `/bio` via `getBioLinksData()`). Tipo: `linkBio`.
+- Se o Sanity falhar ou vier vazio, o site usa os fallbacks estáticos em `site/src/data/publicacoes.ts` e `site/src/data/links.ts`. **Não quebrar esses fallbacks.**
+- A página `/links` conta com renderização estática SSG + revalidação leve em segundo plano no cliente via Sanity CDN, permitindo atualizações imediatas de links sem necessidade de rebuild.
 - Todo o resto do conteúdo (hero, bio, palestras, consultoria, galeria etc.) é **estático no código** (`site/src/i18n/translations.ts`, `site/src/data/*.ts`).
 - Ao commitar mudanças no site, **não incluir** `cms/.sanity/` (cache) nem alterar `cms/` sem pedido explícito.
 

@@ -1,0 +1,553 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { getBioLinksData } from '../lib/sanity';
+import { BIO_PROFILE } from '../data/links';
+import { SITE } from '../i18n';
+
+const links = await getBioLinksData();
+
+const getCategoryIcon = (categoria?: string) => {
+  switch (categoria) {
+    case 'Artigo':
+      return 'BookOpen';
+    case 'Consultoria':
+      return 'Briefcase';
+    case 'Palestra':
+      return 'Megaphone';
+    case 'Newsletter':
+      return 'Mail';
+    case 'WhatsApp':
+      return 'MessageCircle';
+    default:
+      return 'Sparkles';
+  }
+};
+---
+
+<Base
+  lang="pt"
+  title={`${BIO_PROFILE.nome} | Links & Conteúdos`}
+  description={BIO_PROFILE.bio}
+>
+  <main class="biolinks-page dot-grid" id="main-content">
+    <div class="biolinks-wrap">
+      <!-- ── PROFILE HEADER ── -->
+      <header class="biolinks-header" data-reveal>
+        <div class="biolinks-avatar-wrap">
+          <img
+            src={BIO_PROFILE.avatar}
+            alt={BIO_PROFILE.nome}
+            width="128"
+            height="128"
+            class="biolinks-avatar"
+            loading="eager"
+            decoding="async"
+          />
+          <span class="biolinks-avatar-badge" title="Verificado">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M13.333 4L6 11.333 2.667 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+
+        <h1 class="biolinks-name">{BIO_PROFILE.nome}</h1>
+
+        <div class="biolinks-badge font-mono">
+          <span class="biolinks-dot"></span>
+          <span>{BIO_PROFILE.titulo}</span>
+        </div>
+
+        <p class="biolinks-bio">{BIO_PROFILE.bio}</p>
+
+        <!-- Social Quick Bar -->
+        <div class="biolinks-social" role="list" aria-label="Redes sociais e contato">
+          <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer" class="biolinks-social-btn" aria-label="LinkedIn" title="LinkedIn">
+            <Icon name="Linkedin" size={17} stroke={1.75} />
+          </a>
+          <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="biolinks-social-btn" aria-label="WhatsApp" title="WhatsApp">
+            <Icon name="MessageCircle" size={17} stroke={1.75} />
+          </a>
+          <a href={BIO_PROFILE.redes.site} target="_blank" rel="noopener noreferrer" class="biolinks-social-btn" aria-label="Site Oficial" title="Site Oficial">
+            <Icon name="Globe" size={17} stroke={1.75} />
+          </a>
+          <a href={`mailto:${SITE.email}`} class="biolinks-social-btn" aria-label="E-mail" title="E-mail">
+            <Icon name="Mail" size={17} stroke={1.75} />
+          </a>
+        </div>
+      </header>
+
+      <!-- ── LINKS LIST CONTAINER ── -->
+      <section class="biolinks-list" id="biolinks-container" aria-label="Links em destaque">
+        {links.map((link) => (
+          <a
+            href={link.url}
+            target={link.url.startsWith('http') ? '_blank' : '_self'}
+            rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+            class:list={[
+              'biocard',
+              { 'biocard--featured': link.destaque },
+            ]}
+            data-link-id={link.id}
+          >
+            <!-- Thumbnail ou Ícone da Categoria -->
+            <div class="biocard__media">
+              {link.imagemUrl ? (
+                <img
+                  src={link.imagemUrl}
+                  alt=""
+                  class="biocard__img"
+                  loading="lazy"
+                  width="56"
+                  height="56"
+                />
+              ) : (
+                <div class="biocard__icon-box">
+                  <Icon name={getCategoryIcon(link.categoria) as any} size={20} stroke={1.75} />
+                </div>
+              )}
+            </div>
+
+            <!-- Conteúdo textual do link -->
+            <div class="biocard__body">
+              <div class="biocard__head">
+                {link.tagDestaque ? (
+                  <span class="biocard__tag font-mono">{link.tagDestaque}</span>
+                ) : (
+                  link.categoria && <span class="biocard__cat font-mono">{link.categoria}</span>
+                )}
+              </div>
+              <h2 class="biocard__title">{link.titulo}</h2>
+              {link.subtitulo && <p class="biocard__sub">{link.subtitulo}</p>}
+            </div>
+
+            <!-- Seta de Ação -->
+            <div class="biocard__arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </a>
+        ))}
+      </section>
+
+      <!-- ── FOOTER ── -->
+      <footer class="biolinks-footer">
+        <a href="/" class="biolinks-logo font-pixel">
+          GUEDES<span>.</span>AI
+        </a>
+        <p class="biolinks-copy font-mono">
+          Site oficial · <a href="/">lguedes.com.br →</a>
+        </p>
+      </footer>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .biolinks-page {
+    min-height: 100svh;
+    background:
+      radial-gradient(circle at 50% 12%, hsl(243 75% 59% / 0.075), transparent 50%),
+      radial-gradient(circle at 85% 90%, hsl(173 80% 36% / 0.05), transparent 45%),
+      var(--bg);
+    display: flex;
+    justify-content: center;
+    padding: clamp(2rem, 5vw, 4rem) var(--gutter);
+  }
+
+  .biolinks-wrap {
+    width: 100%;
+    max-width: 580px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Header do Perfil ── */
+  .biolinks-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  .biolinks-avatar-wrap {
+    position: relative;
+    width: 104px;
+    height: 104px;
+    margin-bottom: 1.15rem;
+  }
+  .biolinks-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow:
+      0 0 0 2px var(--line),
+      0 12px 28px -10px hsl(240 24% 9% / 0.15);
+  }
+  .biolinks-avatar-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid #fff;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 10px hsl(243 75% 59% / 0.35);
+  }
+
+  .biolinks-name {
+    font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    line-height: 1.15;
+  }
+
+  .biolinks-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: hsl(0 0% 100% / 0.8);
+    border: 1px solid var(--line);
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    letter-spacing: 0.04em;
+    margin-bottom: 0.85rem;
+    box-shadow: 0 2px 8px -2px hsl(240 10% 12% / 0.04);
+  }
+  .biolinks-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 0 3px hsl(243 75% 59% / 0.18);
+  }
+
+  .biolinks-bio {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 44ch;
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Barra de Redes Sociais ── */
+  .biolinks-social {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .biolinks-social-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    display: grid;
+    place-items: center;
+    transition:
+      transform 0.25s var(--ease-out),
+      border-color 0.25s ease,
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+  .biolinks-social-btn:hover {
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--line));
+    background: color-mix(in srgb, var(--primary) 8%, var(--bg-elev));
+    transform: translateY(-2px);
+  }
+
+  /* ── Lista de Cards de Links (Itaú Design inspired) ── */
+  .biolinks-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  .biocard {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.95rem 1.15rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform 0.25s var(--ease-out),
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      background-color 0.25s ease;
+    box-shadow: 0 4px 16px -6px hsl(240 24% 9% / 0.04);
+  }
+
+  .biocard:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--primary) 42%, var(--line));
+    box-shadow:
+      0 16px 32px -12px hsl(240 24% 9% / 0.08),
+      0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  /* Card em destaque especial */
+  .biocard--featured {
+    border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+    background:
+      radial-gradient(circle at 100% 0%, hsl(243 75% 59% / 0.08), transparent 60%),
+      var(--bg-elev);
+  }
+  .biocard--featured::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary);
+    border-radius: 4px 0 0 4px;
+  }
+
+  /* Media / Thumbnail / Ícone */
+  .biocard__media {
+    flex-shrink: 0;
+  }
+  .biocard__img {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--line);
+  }
+  .biocard__icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--primary) 9%, var(--bg-soft));
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--line));
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    transition: transform 0.25s var(--ease-out);
+  }
+  .biocard:hover .biocard__icon-box {
+    transform: scale(1.06);
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  /* Texto */
+  .biocard__body {
+    flex: 1;
+    min-width: 0;
+  }
+  .biocard__head {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.25rem;
+  }
+  .biocard__tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+  }
+  .biocard__cat {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .biocard__title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.28;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 0.2rem;
+    transition: color 0.2s ease;
+  }
+  .biocard:hover .biocard__title {
+    color: var(--primary);
+  }
+
+  .biocard__sub {
+    font-size: 0.78rem;
+    line-height: 1.42;
+    color: var(--ink-2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Seta */
+  .biocard__arrow {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--ink-3);
+    border: 1px solid transparent;
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease,
+      background-color 0.25s ease,
+      transform 0.25s var(--ease-out);
+  }
+  .biocard:hover .biocard__arrow {
+    color: var(--primary);
+    border-color: color-mix(in srgb, var(--primary) 30%, var(--line));
+    background: var(--bg-soft);
+    transform: translate(2px, -2px);
+  }
+
+  /* ── Footer ── */
+  .biolinks-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-align: center;
+  }
+  .biolinks-logo {
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .biolinks-logo span {
+    color: var(--primary);
+  }
+  .biolinks-logo:hover {
+    color: var(--primary);
+  }
+  .biolinks-copy {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .biolinks-copy a {
+    color: var(--ink-2);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .biolinks-copy a:hover {
+    color: var(--primary);
+  }
+</style>
+
+<script>
+  // Revalidação em tempo real via Sanity CDN (para refletir novas edições do Studio na hora)
+  async function refreshLinksFromSanity() {
+    try {
+      const query = encodeURIComponent(`*[_type == "linkBio" && ativo != false] | order(ordem asc, _createdAt desc) {
+        "id": _id,
+        titulo,
+        subtitulo,
+        url,
+        categoria,
+        tagDestaque,
+        destaque,
+        "imagemUrl": imagem.asset->url,
+        ativo,
+        ordem
+      }`);
+      const endpoint = `https://84rosfy5.api.sanity.io/v2024-01-01/data/query/production?query=${query}`;
+      const res = await fetch(endpoint);
+      if (!res.ok) return;
+      const { result } = await res.json();
+      if (!Array.isArray(result) || result.length === 0) return;
+
+      const container = document.getElementById('biolinks-container');
+      if (!container) return;
+
+      const getIconSvg = (categoria: string) => {
+        switch (categoria) {
+          case 'Artigo':
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+          case 'Consultoria':
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>';
+          case 'Palestra':
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>';
+          case 'Newsletter':
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>';
+          case 'WhatsApp':
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>';
+          default:
+            return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>';
+        }
+      };
+
+      const html = result.map((link: any) => {
+        const isExternal = link.url && link.url.startsWith('http');
+        const targetAttr = isExternal ? 'target="_blank" rel="noopener noreferrer"' : '';
+        const featuredClass = link.destaque ? 'biocard--featured' : '';
+        const mediaHtml = link.imagemUrl
+          ? `<img src="${link.imagemUrl}" alt="" class="biocard__img" loading="lazy" width="48" height="48" />`
+          : `<div class="biocard__icon-box">${getIconSvg(link.categoria || 'Geral')}</div>`;
+        const tagHtml = link.tagDestaque
+          ? `<span class="biocard__tag font-mono">${link.tagDestaque}</span>`
+          : (link.categoria ? `<span class="biocard__cat font-mono">${link.categoria}</span>` : '');
+        const subHtml = link.subtitulo ? `<p class="biocard__sub">${link.subtitulo}</p>` : '';
+
+        return `
+          <a href="${link.url}" ${targetAttr} class="biocard ${featuredClass}" data-link-id="${link.id}">
+            <div class="biocard__media">${mediaHtml}</div>
+            <div class="biocard__body">
+              <div class="biocard__head">${tagHtml}</div>
+              <h2 class="biocard__title">${link.titulo}</h2>
+              ${subHtml}
+            </div>
+            <div class="biocard__arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
+                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    } catch {
+      // Falha silenciosa: mantém o HTML pré-renderizado perfeitamente funcional
+    }
+  }
+
+  // Executa após carregamento inicial da página para não travar o FCP
+  if (typeof window !== 'undefined') {
+    window.addEventListener('load', () => {
+      setTimeout(refreshLinksFromSanity, 600);
+    });
+  }
+</script>

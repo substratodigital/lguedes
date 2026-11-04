@@ -14,6 +14,7 @@ import {
   type Premio,
   type Midia,
 } from '../data/publicacoes';
+import { BIO_LINKS_FALLBACK, type BioLink } from '../data/links';
 
 const projectId = import.meta.env.SANITY_PROJECT_ID || '84rosfy5';
 const dataset = import.meta.env.SANITY_DATASET || 'production';
@@ -98,5 +99,27 @@ export async function getPublicacoesData(): Promise<PublicacoesData> {
       midia: MIDIA,
       artigosOpiniao: ARTIGOS_OPINIAO,
     };
+  }
+}
+
+export async function getBioLinksData(): Promise<BioLink[]> {
+  try {
+    const query = `*[_type == "linkBio" && ativo != false] | order(ordem asc, _createdAt desc) {
+      "id": _id,
+      titulo,
+      subtitulo,
+      url,
+      categoria,
+      tagDestaque,
+      destaque,
+      "imagemUrl": imagem.asset->url,
+      ativo,
+      ordem
+    }`;
+    const res = await sanityClient.fetch(query);
+    return res && res.length > 0 ? res : BIO_LINKS_FALLBACK;
+  } catch (err) {
+    console.warn('[Sanity] Falha ao buscar links da bio. Usando fallback local.', err);
+    return BIO_LINKS_FALLBACK;
   }
 }
