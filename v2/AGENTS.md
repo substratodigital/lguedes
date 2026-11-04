@@ -29,7 +29,8 @@
 - **100% light mode**, editorial tech premium. Vanilla CSS com tokens (sem Tailwind).
 - Fontes: Geist, GeistMono, GeistPixel. Cores: índigo `#4F46E5` (primária), teal `#0D9488`.
 - Animações: GSAP 3 + ScrollTrigger, Canvas/SVG leves, pausadas fora da viewport.
-- **Regra:** nunca numerar itens sem pedido explícito (exceção: códigos oficiais dos produtos de consultoria 1.1–2.7, que vêm do portfólio do professor).
+- **REGRA PRIMORDIAL: NUNCA numerar nada a não ser que for solicitado explicitamente** (exceção única autorizada: a codificação dos produtos de consultoria `1.1` a `2.7`, que é a listagem oficial do PDF do professor). Em palestras, temas, pilares, seções, etapas, cards e headers: **não usar** 01, 02, 03...
+- **REGRA DE BOTÕES / CTAs:** quando houver pares de botões de ação (ex.: Hero da oferta, CTAs principais), manter sempre a **mesma largura**, no desktop posicionados **lado a lado** (um ao lado do outro), sendo **um preenchido (`.btn`) e o outro vazado (`.btn-outline`)** para hierarquia e destaque elegante.
 - Ícones: `lucide-static` não tem mais ícones de marca → LinkedIn é um SVG customizado em `Icon.astro` (`CUSTOM_ICONS`).
 
 ## 4. Estrutura da home (`site/src/pages/index.astro` e `en/index.astro`)
@@ -48,3 +49,4 @@ Hero → Clientes → Bio → **Consultoria** → Palestras → **GaleriaEventos
 - **Hero ASCII (`site/src/scripts/hero-ascii.ts`)**: shader WebGL. Não usar hash `sin(...)*43758` (estoura `mediump` em GPUs mobile e some no celular). No mobile o retrato é centralizado com `cx = w * 0.465`.
 - **Galeria de eventos**: fotos padronizadas em `site/public/img/eventos/evento-XX.webp` (800×540). Novas fotos: converter para `.webp` no mesmo tamanho.
 - **Footer**: só a foto `/img/guedes-formal.webp` grande, sem efeito ASCII e sem linha cinza.
+

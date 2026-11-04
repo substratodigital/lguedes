@@ -29,7 +29,6 @@ const items = t.palestras.items as any[];
             style={`--accent:${item.accentColor}`}
           >
             <span class="pal__tab-bar" aria-hidden="true"></span>
-            <span class="pal__tab-num font-mono">{item.num}</span>
             <span class="pal__tab-title">{item.title}</span>
             <span class="pal__tab-badge">{item.badge}</span>
           </button>
@@ -54,7 +53,6 @@ const items = t.palestras.items as any[];
             style={`--accent:${p.accentColor}`}
           >
             <div class="pal__meta" data-pal-in>
-              <span class="pal__meta-num font-mono">{p.num} /</span>
               <span class="pal__badge">
                 <Icon name="Megaphone" size={12} stroke={2} />
                 {p.badge}

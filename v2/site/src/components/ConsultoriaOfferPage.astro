@@ -43,10 +43,6 @@ const homeConsultoriaHref = `${homePath(lang).replace(/\/+$/, '') || ''}/#consul
             <span aria-hidden="true">←</span>
             <span>{data.backHomeLabel}</span>
           </a>
-          <span class="coffer-axis-pill font-mono">
-            <span class="coffer-axis-dot"></span>
-            {offer.axisLabel}
-          </span>
         </div>
 
         <div class="coffer-hero__grid">
@@ -74,11 +70,6 @@ const homeConsultoriaHref = `${homePath(lang).replace(/\/+$/, '') || ''}/#consul
           <!-- Architectural Visual Asset for Hero -->
           <div class="coffer-hero__visual" data-reveal>
             <div class="coffer-blueprint">
-              <div class="coffer-blueprint__head font-mono">
-                <span>SYS.PORTFOLIO // EIXO {offer.num}</span>
-                <span>{offer.products.length} {data.solutionsCountLabel.toUpperCase()}</span>
-              </div>
-
               <div class="coffer-blueprint__stage">
                 {offerIndex === 0 ? (
                   <svg viewBox="0 0 440 340" class="coffer-blueprint__svg" fill="none" aria-hidden="true">
@@ -153,15 +144,7 @@ const homeConsultoriaHref = `${homePath(lang).replace(/\/+$/, '') || ''}/#consul
           </div>
         </div>
 
-        <!-- Stats Strip -->
-        <dl class="coffer-stats" data-reveal>
-          {offer.stats.map((st) => (
-            <div class="coffer-stats__item">
-              <dt class="coffer-stats__label font-mono">{st.label}</dt>
-              <dd class="coffer-stats__value">{st.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <!-- Stats Strip removido para não poluir com números arbitrários -->
       </div>
     </section>
 
@@ -179,7 +162,6 @@ const homeConsultoriaHref = `${homePath(lang).replace(/\/+$/, '') || ''}/#consul
         <div class="coffer-pillars">
           {offer.pillars.map((pillar) => (
             <article class="coffer-pillar" data-reveal>
-              <span class="coffer-pillar__num font-mono">{pillar.num}</span>
               <h3 class="coffer-pillar__title">{pillar.title}</h3>
               <p class="coffer-pillar__desc">{pillar.desc}</p>
             </article>
@@ -200,7 +182,7 @@ const homeConsultoriaHref = `${homePath(lang).replace(/\/+$/, '') || ''}/#consul
           <!-- Sticky Side Navigation Rail -->
           <aside class="coffer-rail" aria-label={data.railLabel}>
             <div class="coffer-rail__inner">
-              <span class="coffer-rail__heading font-mono">{data.railLabel} ({offer.products.length})</span>
+              <span class="coffer-rail__heading font-mono">{data.railLabel}</span>
               <nav class="coffer-rail__nav">
                 {offer.products.map((prod, idx) => (
                   <a
@@ -237,10 +219,6 @@ const homeConsultoriaHref = `${homePath(lang).replace(/\/+$/, '') || ''}/#consul
 
                   <!-- Bespoke Minimalist Schematic Diagram per Product -->
                   <div class="pcard__diagram" aria-hidden="true">
-                    <div class="pcard__diagram-head font-mono">
-                      <span>FIG.{prod.num}</span>
-                      <span>{prod.diagram.toUpperCase()}</span>
-                    </div>
                     <svg viewBox="0 0 240 140" class="pcard__svg" fill="none">
                       {prod.diagram === 'diagnostico' && (
                         <g>
@@ -589,8 +567,25 @@ const homeConsultoriaHref = `${homePath(lang).replace(/\/+$/, '') || ''}/#consul
 
   .coffer-hero__actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.85rem;
+    width: 100%;
+  }
+  .coffer-hero__actions .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+  @media (min-width: 640px) {
+    .coffer-hero__actions {
+      flex-direction: row;
+      align-items: center;
+      width: auto;
+    }
+    .coffer-hero__actions .btn {
+      width: auto;
+      min-width: 280px;
+    }
   }
 
   /* ── Blueprint Visual Box ── */

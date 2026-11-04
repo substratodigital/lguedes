@@ -34,17 +34,6 @@ const data = CONSULTORIA_DATA[lang];
           <div class="ccard__stage" data-stage>
             <div class="ccard__stage-grid" aria-hidden="true"></div>
 
-            <!-- Top HUD bar inside stage -->
-            <div class="ccard__hud-top font-mono" aria-hidden="true">
-              <span class="ccard__hud-badge">
-                <span class="ccard__hud-dot"></span>
-                <span>SYS.{offer.num} // {idx === 0 ? 'ARCH_MATRIX' : 'AI_TELEMETRY'}</span>
-              </span>
-              <span class="ccard__hud-coord" data-hud-coord>
-                {idx === 0 ? 'COHERENCE: 98.4%' : 'SIGNAL: +34.8%'}
-              </span>
-            </div>
-
             <!-- Interactive HTML5 Canvas for ultra-minimalist micro-animations -->
             <canvas
               class="ccard__canvas"
@@ -80,37 +69,28 @@ const data = CONSULTORIA_DATA[lang];
               </svg>
             )}
 
-            <!-- Bottom HUD bar inside stage -->
+            <!-- Bottom HUD: apenas a identificação limpa no canto -->
             <div class="ccard__hud-bottom font-mono" aria-hidden="true">
-              <span class="ccard__hud-status" data-hud-status>
+              <span class="ccard__hud-status">
                 {idx === 0
-                  ? (lang === 'pt' ? '[1.1 → 1.8] ARQUITETURA & GOVERNANÇA' : '[1.1 → 1.8] ARCHITECTURE & GOVERNANCE')
-                  : (lang === 'pt' ? '[2.1 → 2.7] EFICIÊNCIA & IA APLICADA' : '[2.1 → 2.7] EFFICIENCY & APPLIED AI')}
-              </span>
-              <span class="ccard__hud-count">
-                {String(offer.products.length).padStart(2, '0')} {data.solutionsCountLabel}
+                  ? (lang === 'pt' ? 'arquitetura e governança' : 'architecture and governance')
+                  : (lang === 'pt' ? 'eficiência e IA aplicada' : 'efficiency and applied AI')}
               </span>
             </div>
           </div>
 
           <!-- Card Body -->
           <div class="ccard__body">
-            <div class="ccard__meta">
-              <span class="ccard__num font-mono">{offer.num}</span>
-              <span class="ccard__axis font-mono">{offer.axisLabel}</span>
-            </div>
-
             <h3 class="ccard__title">{offer.title}</h3>
             <p class="ccard__desc">{offer.cardSummary}</p>
 
-            <!-- Interactive Product Chips (1.1-1.8 / 2.1-2.7) -->
+            <!-- Interactive Product Chips (em coluna única alinhada) -->
             <div class="ccard__products" role="list" aria-label={data.solutionsCountLabel}>
               {offer.products.map((prod) => (
                 <a
                   href={`${offer.href}#prod-${prod.id}`}
                   class="ccard__chip"
                   role="listitem"
-                  data-prod-label={`[${prod.num}] ${prod.tag.toUpperCase()}`}
                 >
                   <span class="ccard__chip-num font-mono">{prod.num}</span>
                   <span class="ccard__chip-name">{prod.title}</span>
@@ -454,30 +434,42 @@ const data = CONSULTORIA_DATA[lang];
     margin-bottom: 1.5rem;
   }
 
-  /* ── Product Micro-Pills ── */
+  /* ── Product Micro-Pills (Coluna única alinhada) ── */
   .ccard__products {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.45rem;
     margin-bottom: 1.85rem;
     pointer-events: auto;
   }
 
   .ccard__chip {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.34rem 0.68rem;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.55rem 0.85rem;
     border-radius: var(--radius-xs);
     background: var(--bg-soft);
     border: 1px solid var(--line);
-    font-size: 0.76rem;
-    line-height: 1.25;
+    font-size: 0.82rem;
+    line-height: 1.35;
     color: var(--ink-2);
     transition:
       background-color 0.22s ease,
       border-color 0.22s ease,
       color 0.22s ease,
+      transform 0.22s var(--ease-out);
+  }
+  .ccard__chip-num {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--card-accent);
+    min-width: 1.8rem;
+  }
+  .ccard__chip-name {
+    font-weight: 500;
+  }
       transform 0.22s var(--ease-out);
   }
   .ccard__chip-num {
@@ -548,22 +540,7 @@ const data = CONSULTORIA_DATA[lang];
       const kind = card.dataset.consultoriaCard;
       const canvas = card.querySelector<HTMLCanvasElement>('[data-card-canvas]');
       const stage = card.querySelector<HTMLElement>('[data-stage]');
-      const coordEl = card.querySelector<HTMLElement>('[data-hud-coord]');
-      const statusEl = card.querySelector<HTMLElement>('[data-hud-status]');
       const reticle = card.querySelector<SVGGElement>('[data-reticle]');
-      const defaultStatus = statusEl?.textContent || '';
-
-      // Update HUD status when hovering individual product chips
-      card.querySelectorAll<HTMLElement>('[data-prod-label]').forEach((chip) => {
-        chip.addEventListener('mouseenter', () => {
-          if (statusEl && chip.dataset.prodLabel) {
-            statusEl.textContent = chip.dataset.prodLabel;
-          }
-        });
-        chip.addEventListener('mouseleave', () => {
-          if (statusEl) statusEl.textContent = defaultStatus;
-        });
-      });
 
       // Stage click navigates to offer href
       const mainLink = card.querySelector<HTMLAnchorElement>('.ccard__MainLink');
@@ -622,16 +599,6 @@ const data = CONSULTORIA_DATA[lang];
           const dx = (tx - 0.5) * 140;
           const dy = (ty - 0.5) * 65;
           reticle.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0)`;
-        }
-
-        if (coordEl) {
-          if (kind === 'complexity') {
-            const coh = (96.2 + (1 - Math.hypot(tx - 0.5, ty - 0.5)) * 3.5).toFixed(1);
-            coordEl.textContent = `COHERENCE: ${coh}%`;
-          } else {
-            const gain = (28.0 + tx * 14.5).toFixed(1);
-            coordEl.textContent = `SIGNAL: +${gain}%`;
-          }
         }
       });
 
