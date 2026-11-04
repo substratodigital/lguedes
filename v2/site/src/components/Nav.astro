@@ -1,9 +1,17 @@
 ---
 import { type Lang, useT, SITE, homePath, LANGS } from '../i18n';
 import Icon from './Icon.astro';
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props {
+  lang: Lang;
+  altLangHref?: Partial<Record<Lang, string>>;
+}
+const { lang, altLangHref } = Astro.props;
 const t = useT(lang);
+const cleanPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isHome = cleanPath === '/' || cleanPath === '/en';
+const baseHome = homePath(lang) === '/' ? '' : homePath(lang).replace(/\/+$/, '');
+const resolveHref = (href: string) =>
+  !isHome && href.startsWith('#') && href !== '#contato' ? `${baseHome}/${href}` : href;
 ---
 <header class="nav" id="site-nav" data-nav>
   <div class="container nav__inner">
@@ -13,7 +21,7 @@ const t = useT(lang);
 
     <nav class="nav__links" aria-label="Principal">
       {t.nav.links.map((l) => (
-        <a href={l.href} class="nav__link" id={`nav-link-${l.href.slice(1)}`}>{l.name}</a>
+        <a href={resolveHref(l.href)} class="nav__link" id={`nav-link-${l.href.slice(1)}`}>{l.name}</a>
       ))}
     </nav>
 
@@ -24,7 +32,7 @@ const t = useT(lang);
 
       <div class="nav__lang" role="group" aria-label="Idioma">
         {LANGS.map((l) => (
-          <a href={homePath(l)} class:list={['nav__lang-item', { 'is-active': l === lang }]} hreflang={l} id={`nav-lang-${l}`} aria-current={l === lang ? 'true' : undefined}>{l}</a>
+          <a href={altLangHref?.[l] ?? homePath(l)} class:list={['nav__lang-item', { 'is-active': l === lang }]} hreflang={l} id={`nav-lang-${l}`} aria-current={l === lang ? 'true' : undefined}>{l}</a>
         ))}
       </div>
 
@@ -40,7 +48,7 @@ const t = useT(lang);
 <div class="mmenu" id="mobile-menu" hidden>
   <nav class="mmenu__list" aria-label="Menu mobile">
     {t.nav.links.map((l, i) => (
-      <a href={l.href} class="mmenu__item" data-mmenu-item>
+      <a href={resolveHref(l.href)} class="mmenu__item" data-mmenu-item>
         <span class="mmenu__num font-mono">{String(i + 1).padStart(2, '0')}</span>
         <span class="mmenu__label">{l.name}</span>
         <span class="mmenu__arrow" aria-hidden="true">→</span>

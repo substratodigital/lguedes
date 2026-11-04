@@ -3,6 +3,7 @@ export const translations = {
     nav: {
       links: [
         { name: "Sobre",       href: "#trajetoria" },
+        { name: "Consultoria", href: "#consultoria" },
         { name: "Palestras",   href: "#palestras" },
         { name: "Publicações", href: "#publicacoes" },
         { name: "Serviços",    href: "#solucoes" },
@@ -280,6 +281,7 @@ export const translations = {
     nav: {
       links: [
         { name: "About",        href: "#trajetoria" },
+        { name: "Consulting",   href: "#consultoria" },
         { name: "Talks",        href: "#palestras" },
         { name: "Publications", href: "#publicacoes" },
         { name: "Services",     href: "#solucoes" },
@@ -500,6 +502,7 @@ export const translations = {
     nav: {
       links: [
         { name: "Sobre Mí",      href: "#trajetoria" },
+        { name: "Consultoría",   href: "#consultoria" },
         { name: "Conferencias",  href: "#palestras" },
         { name: "Publicaciones", href: "#publicacoes" },
         { name: "Servicios",     href: "#solucoes" },

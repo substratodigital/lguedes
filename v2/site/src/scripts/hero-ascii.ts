@@ -16,7 +16,12 @@ void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }
 `;
 
 const FRAG = `
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
 precision mediump float;
+#endif
+
 uniform sampler2D uImg;
 uniform sampler2D uAtlas;
 uniform vec2  uRes;
@@ -30,7 +35,12 @@ uniform float uGlyphs;
 uniform vec3  uInk;
 uniform vec3  uAccent;
 
-float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+// Hash sem sin() para evitar overflow de mediump (fp16) em GPUs mobile
+float hash(vec2 p){
+  vec2 p2 = fract(p * vec2(0.1031, 0.1030));
+  p2 += dot(p2, p2.yx + 33.33);
+  return fract((p2.x + p2.y) * p2.x);
+}
 
 void main(){
   vec2 px     = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
@@ -59,10 +69,10 @@ void main(){
   if (p < 0.0) discard;
   float decoding = 1.0 - step(0.22, p);
 
-  // Interação do mouse: embaralha glifos e puxa para o índigo
+  // Interação do mouse/toque: embaralha glifos e puxa para o índigo
   float md = length(center - uMouse);
   float m  = (1.0 - smoothstep(0.0, uCell * 16.0, md)) * uMouseAmt;
-  float tick = floor(uTime * 14.0);
+  float tick = mod(floor(uTime * 14.0), 256.0);
   float scr  = max(decoding, step(hash(cell + tick), m * 0.85));
   if (scr > 0.5) gi = 1.0 + floor(hash(cell * 1.7 + tick) * (uGlyphs - 1.0));
 
@@ -125,21 +135,32 @@ function texture(gl: WebGLRenderingContext, source: TexImageSource, unit: number
 }
 
 export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
-  const gl = canvas.getContext('webgl', {
+  const glOpts: WebGLContextAttributes = {
     alpha: true, antialias: false, premultipliedAlpha: true,
-    depth: false, stencil: false, powerPreference: 'low-power',
-  });
+    depth: false, stencil: false,
+  };
+  const gl = (
+    canvas.getContext('webgl', glOpts) ||
+    canvas.getContext('experimental-webgl', glOpts)
+  ) as WebGLRenderingContext | null;
   if (!gl) return null;
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  // Carrega imagem e fonte em paralelo
+  // Carrega imagem de forma resiliente no mobile (onload + decode opcional) e fonte em paralelo
   const img = new Image();
+  img.crossOrigin = 'anonymous';
   img.decoding = 'async';
-  img.src = opts.src;
+  const imgReady = new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error('hero-img'));
+    img.src = opts.src;
+    if (img.complete && img.naturalWidth > 0) resolve();
+  }).then(() => (img.decode ? img.decode().catch(() => null) : null));
+
   await Promise.all([
-    img.decode(),
+    imgReady,
     document.fonts?.load('600 40px GeistMono').catch(() => null),
   ]);
 
@@ -195,19 +216,24 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
     canvas.height = state.h;
     gl!.viewport(0, 0, state.w, state.h);
     gl!.uniform2f(u.res, state.w, state.h);
-    const mobile = r.width < 768;
-    gl!.uniform1f(u.cell, (mobile ? 6 : 8) * state.dpr);
+    const mobile = window.innerWidth < 768;
+    gl!.uniform1f(u.cell, (mobile ? 5.5 : 8) * state.dpr);
   }
 
   function rect(): [number, number, number, number] {
     const { w, h } = state;
-    const mobile = w / state.dpr < 768;
-    let ih = mobile ? h * 0.62 : h * 0.94;
+    const mobile = window.innerWidth < 768;
+    let ih = mobile ? h * 0.96 : h * 0.94;
     let iw = ih * aspect;
-    if (iw > w * (mobile ? 1.05 : 0.6)) { iw = w * (mobile ? 1.05 : 0.6); ih = iw / aspect; }
-    const cx = mobile ? w / 2 : w * (opts.anchorX ?? 0.66);
+    if (iw > w * (mobile ? 0.96 : 0.6)) {
+      iw = w * (mobile ? 0.96 : 0.6);
+      ih = iw / aspect;
+    }
+    // No recorte original (guedes_ai_grande.webp), o centro visual do rosto/tronco está em ~54% da largura.
+    // Compensamos no mobile (0.46) para que o retrato fique perfeitamente centralizado no eixo X.
+    const cx = mobile ? w * 0.465 : w * (opts.anchorX ?? 0.68);
     const x = cx - iw / 2 + state.ppx * state.dpr;
-    const y = mobile ? h * 0.06 : h - ih;
+    const y = mobile ? (h - ih) * 0.5 : h - ih;
     return [x, y, iw, ih];
   }
 
@@ -248,15 +274,15 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
   new IntersectionObserver(([e]) => { state.visible = e.isIntersecting; if (state.visible) request(); }).observe(canvas);
   document.addEventListener('visibilitychange', () => { state.visible = !document.hidden; if (state.visible) request(); });
 
-  // Mouse (só desktop com ponteiro fino)
-  if (finePointer && !reduced) {
+  // Mouse e toque (desktop e mobile)
+  if (!reduced) {
     const host = canvas.parentElement!;
     host.addEventListener('pointermove', (e) => {
       const r = canvas.getBoundingClientRect();
       state.tx = e.clientX - r.left;
       state.ty = e.clientY - r.top;
       if (state.mx < -999) { state.mx = state.tx; state.my = state.ty; }
-      state.px = ((e.clientX / r.width) - 0.5) * -18;
+      if (finePointer) state.px = ((e.clientX / r.width) - 0.5) * -18;
       state.lastMove = performance.now();
       request();
     }, { passive: true });

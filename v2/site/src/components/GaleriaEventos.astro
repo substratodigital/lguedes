@@ -1,0 +1,353 @@
+---
+import { type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const copy = {
+  pt: {
+    label: 'EM AÇÃO · HISTÓRICO DE EVENTOS',
+    h2: 'Palcos, fóruns executivos e imersões acadêmicas',
+    p: 'Registros de palestras, congressos, programas de liderança e premiações ao longo de mais de três décadas conectando ciência, estratégia e negócios.',
+    row1: [
+      { src: '/img/eventos/evento-01.webp', tag: 'Keynote Executivo', alt: 'Prof. Luís Guedes em palestra executiva' },
+      { src: '/img/eventos/evento-02.webp', tag: 'Imersão In-Company', alt: 'Prof. Luís Guedes em aula executiva' },
+      { src: '/img/eventos/evento-03.webp', tag: 'APAS Show · IA', alt: 'Palestra Ética e Transparência no Uso da IA no APAS Show' },
+      { src: '/img/eventos/evento-04.webp', tag: 'Seminário Inovação', alt: 'Prof. Luís Guedes palestrando em auditório' },
+      { src: '/img/eventos/evento-05.webp', tag: 'Turma Executiva', alt: 'Prof. Luís Guedes com alunos executivos' },
+      { src: '/img/eventos/evento-06.webp', tag: 'IT Fórum', alt: 'Palestra O Executivo Conectado no IT Fórum' },
+      { src: '/img/eventos/evento-07.webp', tag: 'Homenagem & Docência', alt: 'Premiação de excelência didática' },
+      { src: '/img/eventos/evento-08.webp', tag: 'Masterclass Estratégia', alt: 'Prof. Luís Guedes em exposição executiva' },
+    ],
+    row2: [
+      { src: '/img/eventos/evento-09.webp', tag: 'Congresso ABEVD', alt: 'Narrativas de um Novo Futuro — Congresso Nacional ABEVD' },
+      { src: '/img/eventos/evento-10.webp', tag: 'Desenvolvimento Gerencial', alt: 'Encerramento de turma com Prof. Luís Guedes' },
+      { src: '/img/eventos/evento-11.webp', tag: 'FIA Business School', alt: 'Prof. Luís Guedes em palestra pela FIA Business School' },
+      { src: '/img/eventos/evento-12.webp', tag: 'Semana Economia Criativa', alt: 'Painel na Semana de Economia Criativa' },
+      { src: '/img/eventos/evento-13.webp', tag: 'Mérito Acadêmico', alt: 'Entrega de placa de homenagem acadêmica' },
+      { src: '/img/eventos/evento-14.webp', tag: 'Transmissão & Conteúdo', alt: 'Bastidores de gravação e palestra ao vivo' },
+      { src: '/img/eventos/evento-15.webp', tag: 'Reconhecimento Institucional', alt: 'Homenagem institucional ao Prof. Luís Guedes' },
+      { src: '/img/eventos/evento-16.webp', tag: 'Arena Executiva', alt: 'Apresentação em arena principal de tecnologia' },
+    ],
+  },
+  en: {
+    label: 'IN ACTION · EVENT HISTORY',
+    h2: 'Stages, executive forums, and academic immersions',
+    p: 'Moments from keynotes, conferences, leadership programs, and awards across more than three decades connecting science, strategy, and business.',
+    row1: [
+      { src: '/img/eventos/evento-01.webp', tag: 'Executive Keynote', alt: 'Prof. Luís Guedes delivering an executive keynote' },
+      { src: '/img/eventos/evento-02.webp', tag: 'In-Company Immersion', alt: 'Prof. Luís Guedes teaching an executive class' },
+      { src: '/img/eventos/evento-03.webp', tag: 'APAS Show · AI Ethics', alt: 'Ethics and Transparency in AI keynote at APAS Show' },
+      { src: '/img/eventos/evento-04.webp', tag: 'Innovation Seminar', alt: 'Prof. Luís Guedes speaking at an auditorium' },
+      { src: '/img/eventos/evento-05.webp', tag: 'Executive Cohort', alt: 'Prof. Luís Guedes with executive students' },
+      { src: '/img/eventos/evento-06.webp', tag: 'IT Forum', alt: 'The Connected Executive keynote at IT Forum' },
+      { src: '/img/eventos/evento-07.webp', tag: 'Teaching Excellence', alt: 'Teaching excellence award ceremony' },
+      { src: '/img/eventos/evento-08.webp', tag: 'Strategy Masterclass', alt: 'Prof. Luís Guedes during a strategy masterclass' },
+    ],
+    row2: [
+      { src: '/img/eventos/evento-09.webp', tag: 'ABEVD Congress', alt: 'Narratives of a New Future — ABEVD National Congress' },
+      { src: '/img/eventos/evento-10.webp', tag: 'Management Development', alt: 'Cohort celebration with Prof. Luís Guedes' },
+      { src: '/img/eventos/evento-11.webp', tag: 'FIA Business School', alt: 'Prof. Luís Guedes speaking at FIA Business School' },
+      { src: '/img/eventos/evento-12.webp', tag: 'Creative Economy Week', alt: 'Panel at Creative Economy Week' },
+      { src: '/img/eventos/evento-13.webp', tag: 'Academic Merit', alt: 'Academic merit plaque presentation' },
+      { src: '/img/eventos/evento-14.webp', tag: 'Live Broadcast', alt: 'Behind the scenes of a live keynote broadcast' },
+      { src: '/img/eventos/evento-15.webp', tag: 'Institutional Honor', alt: 'Institutional award tribute to Prof. Luís Guedes' },
+      { src: '/img/eventos/evento-16.webp', tag: 'Executive Arena', alt: 'Keynote at main technology arena' },
+    ],
+  },
+}[lang] ?? {
+  label: 'EM AÇÃO · HISTÓRICO DE EVENTOS',
+  h2: 'Palcos, fóruns executivos e imersões acadêmicas',
+  p: '',
+  row1: [],
+  row2: [],
+};
+---
+
+<section id="eventos" class="section ev-gallery" aria-labelledby="ev-gallery-title">
+  <div class="container">
+    <div class="ev-gallery__head" data-reveal>
+      <div>
+        <span class="eyebrow">{copy.label}</span>
+        <h2 class="h2 ev-gallery__title" id="ev-gallery-title">{copy.h2}</h2>
+      </div>
+      <p class="ev-gallery__lead">{copy.p}</p>
+    </div>
+  </div>
+
+  <div class="ev-gallery__stage" data-reveal>
+    <!-- Fileira 1: movimento contínuo para a esquerda -->
+    <div class="ev-row" data-ev-row data-speed="36" data-dir="1">
+      <div class="ev-row__track" data-ev-track>
+        {[0, 1].map((dup) => (
+          <div class="ev-row__set" aria-hidden={dup === 1 ? 'true' : undefined}>
+            {copy.row1.map((item) => (
+              <figure class="ev-card">
+                <div class="ev-card__frame">
+                  <img
+                    src={item.src}
+                    alt={dup === 0 ? item.alt : ''}
+                    width="800"
+                    height="540"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <figcaption class="ev-card__tag font-mono">{item.tag}</figcaption>
+                </div>
+              </figure>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Fileira 2: movimento contínuo para a direita -->
+    <div class="ev-row" data-ev-row data-speed="40" data-dir="-1">
+      <div class="ev-row__track" data-ev-track>
+        {[0, 1].map((dup) => (
+          <div class="ev-row__set" aria-hidden={dup === 1 ? 'true' : undefined}>
+            {copy.row2.map((item) => (
+              <figure class="ev-card">
+                <div class="ev-card__frame">
+                  <img
+                    src={item.src}
+                    alt={dup === 0 ? item.alt : ''}
+                    width="800"
+                    height="540"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <figcaption class="ev-card__tag font-mono">{item.tag}</figcaption>
+                </div>
+              </figure>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ev-gallery {
+    background: var(--bg);
+    overflow: hidden;
+    padding-top: clamp(2rem, 5vw, 4rem);
+  }
+
+  .ev-gallery__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .ev-gallery__title {
+    max-width: 22ch;
+  }
+
+  .ev-gallery__lead {
+    max-width: 42ch;
+    font-size: 0.975rem;
+    color: var(--ink-2);
+    line-height: 1.65;
+  }
+
+  .ev-gallery__stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.85rem, 1.8vw, 1.35rem);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  }
+
+  .ev-row {
+    overflow: hidden;
+    user-select: none;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .ev-row:active {
+    cursor: grabbing;
+  }
+
+  .ev-row__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .ev-row__set {
+    display: flex;
+    gap: clamp(0.85rem, 1.8vw, 1.35rem);
+    padding-right: clamp(0.85rem, 1.8vw, 1.35rem);
+  }
+
+  .ev-card {
+    flex: 0 0 auto;
+    width: clamp(240px, 28vw, 370px);
+    aspect-ratio: 800 / 540;
+    margin: 0;
+  }
+
+  .ev-card__frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out), border-color 0.3s;
+  }
+
+  .ev-card__frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 52%, hsl(240 25% 8% / 0.68) 100%);
+    opacity: 0.78;
+    transition: opacity 0.35s var(--ease-out);
+    pointer-events: none;
+  }
+
+  .ev-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.005);
+    filter: saturate(0.92) contrast(1.03);
+    transition: transform 0.65s var(--ease-out), filter 0.45s var(--ease-out);
+    pointer-events: none;
+  }
+
+  .ev-card:hover .ev-card__frame {
+    transform: translateY(-3px);
+    border-color: hsl(243 75% 59% / 0.38);
+    box-shadow: var(--shadow);
+  }
+
+  .ev-card:hover img {
+    transform: scale(1.055);
+    filter: saturate(1.05) contrast(1.05);
+  }
+
+  .ev-card__tag {
+    position: absolute;
+    left: 0.85rem;
+    bottom: 0.8rem;
+    z-index: 2;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+    background: hsl(240 20% 10% / 0.58);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid hsl(0 0% 100% / 0.18);
+    padding: 0.28rem 0.68rem;
+    border-radius: var(--radius-pill);
+    transition: background-color 0.25s, border-color 0.25s, transform 0.3s var(--ease-out);
+  }
+
+  .ev-card:hover .ev-card__tag {
+    background: var(--primary);
+    border-color: hsl(0 0% 100% / 0.35);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 640px) {
+    .ev-card {
+      width: clamp(220px, 68vw, 290px);
+    }
+    .ev-gallery__stage {
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+      mask-image: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-ev-row]').forEach((row) => {
+    const track = row.querySelector<HTMLElement>('[data-ev-track]')!;
+    const set = track.firstElementChild as HTMLElement;
+    const speed = Number(row.dataset.speed || 38);
+    const dir = Number(row.dataset.dir || 1);
+    if (reduced) return;
+
+    let tween: gsap.core.Tween | null = null;
+    let visible = false;
+
+    const build = () => {
+      tween?.kill();
+      const w = set.offsetWidth;
+      if (!w) return;
+      gsap.set(track, { x: dir > 0 ? 0 : -w });
+      tween = gsap.to(track, {
+        x: dir > 0 ? -w : 0,
+        duration: w / speed,
+        ease: 'none',
+        repeat: -1,
+      });
+      if (!visible) tween.pause();
+    };
+
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      visible ? tween?.play() : tween?.pause();
+    }, { rootMargin: '150px' }).observe(row);
+
+    row.addEventListener('pointerenter', () => tween && gsap.to(tween, { timeScale: 0.2, duration: 0.5, ease: 'power2.out' }));
+    row.addEventListener('pointerleave', () => tween && gsap.to(tween, { timeScale: 1, duration: 0.5, ease: 'power2.in' }));
+
+    // Suporte a arraste suave (touch / mouse)
+    let startX = 0;
+    let startProg = 0;
+    let dragging = false;
+
+    row.addEventListener('pointerdown', (e) => {
+      if (!tween) return;
+      dragging = true;
+      startX = e.clientX;
+      startProg = tween.progress();
+      tween.pause();
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging || !tween) return;
+      const w = set.offsetWidth || 1;
+      let p = startProg - ((e.clientX - startX) / w) * dir;
+      p = ((p % 1) + 1) % 1;
+      tween.progress(p);
+    }, { passive: true });
+
+    window.addEventListener('pointerup', () => {
+      if (!dragging) return;
+      dragging = false;
+      if (visible) {
+        tween?.play();
+        gsap.to(tween, { timeScale: 1, duration: 0.4 });
+      }
+    });
+
+    let rt = 0;
+    new ResizeObserver(() => {
+      clearTimeout(rt);
+      rt = window.setTimeout(build, 120);
+    }).observe(set);
+
+    build();
+  });
+</script>
+
