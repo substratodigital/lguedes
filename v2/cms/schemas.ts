@@ -59,6 +59,11 @@ export const congressoSchema = {
       type: 'string',
       validation: (Rule: any) => Rule.required(),
     },
+    {
+      name: 'url',
+      title: 'Link do Evento / Vídeo (opcional)',
+      type: 'url',
+    },
   ],
 };
 
@@ -89,6 +94,12 @@ export const livroSchema = {
       name: 'url',
       title: 'Link para Compra (ex: Amazon)',
       type: 'url',
+    },
+    {
+      name: 'capa',
+      title: 'Imagem da Capa (opcional)',
+      type: 'image',
+      options: { hotspot: true },
     },
   ],
 };
@@ -121,6 +132,11 @@ export const capituloSchema = {
       title: 'Editora',
       type: 'string',
       validation: (Rule: any) => Rule.required(),
+    },
+    {
+      name: 'url',
+      title: 'Link para Compra / Editora (opcional)',
+      type: 'url',
     },
   ],
 };

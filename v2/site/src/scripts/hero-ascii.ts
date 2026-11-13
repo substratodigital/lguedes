@@ -1,13 +1,14 @@
 /**
- * Hero ASCII — WebGL puro (sem Three.js / sem postprocessing).
+ * Hero Point-Cloud / Dots — WebGL puro (sem Three.js / sem postprocessing).
  *
- * Princípios de performance:
+ * Inspirado nas referências de v3-ajustes (ref_hero-01 a ref_hero-04):
+ *  - Retrato em matriz densa de pontos circulares (halftone / point-cloud)
+ *    com alta definição facial ("imagem mais clara") e dissolução orgânica
+ *    em partículas nas bordas.
  *  - 1 único draw call (triângulo full-screen + 1 fragment shader).
  *  - Renderiza SOB DEMANDA: só há frames durante a revelação inicial ou
  *    enquanto o mouse se move. Parado = 0% CPU/GPU.
  *  - Pausa fora da viewport (IntersectionObserver) e com aba oculta.
- *  - DPR limitado a 1.5; células maiores no mobile.
- *  - prefers-reduced-motion → 1 frame estático.
  */
 
 const VERT = `
@@ -23,7 +24,6 @@ precision mediump float;
 #endif
 
 uniform sampler2D uImg;
-uniform sampler2D uAtlas;
 uniform vec2  uRes;
 uniform float uCell;
 uniform vec4  uRect;      // x, y, w, h (px, origem topo-esquerda)
@@ -31,63 +31,119 @@ uniform vec2  uMouse;     // px
 uniform float uMouseAmt;  // 0..1
 uniform float uTime;
 uniform float uReveal;    // 0..1
-uniform float uGlyphs;
 uniform vec3  uInk;
 uniform vec3  uAccent;
+uniform vec3  uTeal;
 
-// Hash sem sin() para evitar overflow de mediump (fp16) em GPUs mobile
+// Hash estável sem sin() para evitar overflow de mediump (fp16) em GPUs mobile
 float hash(vec2 p){
   vec2 p2 = fract(p * vec2(0.1031, 0.1030));
   p2 += dot(p2, p2.yx + 33.33);
   return fract((p2.x + p2.y) * p2.x);
 }
 
+vec2 hash2(vec2 p){
+  return vec2(hash(p), hash(p + vec2(17.13, 41.97)));
+}
+
 void main(){
   vec2 px     = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
   vec2 cell   = floor(px / uCell);
   vec2 center = (cell + 0.5) * uCell;
-  vec2 local  = fract(px / uCell);
+  vec2 local  = fract(px / uCell) - 0.5;
 
+  // Coordenada normalizada dentro do retângulo do retrato
   vec2 uv = (center - uRect.xy) / uRect.zw;
-  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) discard;
 
-  vec4  c   = texture2D(uImg, uv);
-  float a   = c.a;
-  float lum = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-  float h   = hash(cell);
+  // Margem extra ao redor para partículas dispersas (point cloud halo)
+  if (uv.x < -0.08 || uv.y < -0.05 || uv.x > 1.08 || uv.y > 1.04) discard;
 
-  // Bordas se dissolvem em caracteres esparsos
-  float vis = step(h, a * 1.25 - 0.1);
-  if (vis < 0.5) discard;
+  vec2 uvClamped = clamp(uv, 0.0, 1.0);
+  vec2 pxUv      = clamp((px - uRect.xy) / uRect.zw, 0.0, 1.0);
 
-  // Densidade = escuridão do pixel (fundo claro → tinta escura)
-  float d  = clamp((1.0 - lum - 0.06) * 1.2, 0.0, 1.0);
-  float gi = floor(d * (uGlyphs - 1.0) + 0.5);
+  vec4 cCell = texture2D(uImg, uvClamped);
+  vec4 cFine = texture2D(uImg, pxUv);
 
-  // Revelação: varredura de cima p/ baixo com ruído; fase "decodificando"
-  float p = uReveal * 1.6 - (uv.y + h * 0.45);
-  if (p < 0.0) discard;
-  float decoding = 1.0 - step(0.22, p);
+  float a     = cCell.a;
+  float aFine = cFine.a;
+  vec2  rnd   = hash2(cell);
+  float h     = rnd.x;
 
-  // Interação do mouse/toque: embaralha glifos e puxa para o índigo
+  // Fora da silhueta: cria partículas esparsas que se dissolvem no ar (estilo ref_hero-01/02)
+  float distEdge = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
+  float inBounds = step(0.0, distEdge);
+  float edgeScatter = smoothstep(0.0, 0.45, a) * inBounds;
+
+  // Halo de partículas ao redor dos ombros/cabeça
+  vec2 headCenter = vec2(0.52, 0.44);
+  float radialDist = length((uv - headCenter) * vec2(1.15, 0.95));
+  float haloProb = smoothstep(0.58, 0.22, radialDist) * 0.16;
+
+  float visProb = max(edgeScatter * 1.18, haloProb);
+  if (h > visProb) discard;
+
+  // Revelação progressiva em nuvem de pontos (de cima p/ baixo com dispersão)
+  float revFront = uReveal * 1.48 - (uv.y * 0.85 + h * 0.38);
+  if (revFront < 0.0) discard;
+  float assembling = 1.0 - smoothstep(0.0, 0.26, revFront);
+
+  // Luminância corrigida para deixar o rosto mais claro, nítido e reconhecível
+  float lumCell = dot(cCell.rgb, vec3(0.299, 0.587, 0.114));
+  float lumFine = dot(cFine.rgb, vec3(0.299, 0.587, 0.114));
+
+  // Curva de brilho suave que valoriza os meios-tons do rosto ("imagem mais clara")
+  float brightCell = pow(clamp(lumCell * 1.14 + 0.04, 0.0, 1.0), 0.82);
+  float brightFine = pow(clamp(lumFine * 1.14 + 0.04, 0.0, 1.0), 0.82);
+
+  // Densidade tonal para o tamanho do dot (áreas escuras = dots maiores; luz = micro-dots)
+  float darkness = clamp(1.0 - brightCell, 0.0, 1.0);
+
+  // Interação com o cursor: ondas de dispersão e destaque nos pontos
   float md = length(center - uMouse);
-  float m  = (1.0 - smoothstep(0.0, uCell * 16.0, md)) * uMouseAmt;
-  float tick = mod(floor(uTime * 14.0), 256.0);
-  float scr  = max(decoding, step(hash(cell + tick), m * 0.85));
-  if (scr > 0.5) gi = 1.0 + floor(hash(cell * 1.7 + tick) * (uGlyphs - 1.0));
+  float m  = (1.0 - smoothstep(0.0, uCell * 18.0, md)) * uMouseAmt;
 
-  vec2  auv = vec2((gi + local.x) / uGlyphs, local.y);
-  float g   = texture2D(uAtlas, auv).a;
+  // Leve jitter orgânico nas bordas, durante a revelação ou sob o mouse
+  float borderFactor = 1.0 - smoothstep(0.2, 0.88, a);
+  vec2 jitter = (rnd - 0.5) * (borderFactor * 0.34 + assembling * 0.42 + m * 0.28);
+  float distDot = length(local - jitter);
 
-  float f   = clamp(smoothstep(0.25, 0.85, lum) * 0.9 + m + decoding * 0.6, 0.0, 1.0);
-  vec3  col = mix(uInk, uAccent, f);
-  float alpha = g * (0.55 + 0.45 * a);
+  // Raio do dot: pontos sempre presentes no retrato para formar a malha point-cloud
+  float baseRadius = mix(0.15, 0.46, pow(darkness, 0.88));
+  // Partículas do halo externo são micro-pontos delicados
+  if (a < 0.15) {
+    baseRadius = mix(0.11, 0.24, rnd.y);
+  }
+  float radius = baseRadius * (1.0 + m * 0.18 - assembling * 0.2);
 
-  gl_FragColor = vec4(col * alpha, alpha);
+  float aa = max(0.045, 0.85 / uCell);
+  float dotMask = 1.0 - smoothstep(radius - aa, radius + aa, distDot);
+
+  // Camada contínua sutil sob os dots no núcleo do rosto para nitidez imediata da expressão
+  float coreClarity = smoothstep(0.45, 0.95, aFine) * (1.0 - darkness * 0.35);
+  float subtlePhoto = (1.0 - brightFine) * 0.28 * coreClarity;
+
+  // Cor dos pontos: combina tinta escura editorial, índigo vibrante nos meios-tons/highlights e pontos de dados
+  float accentMix = clamp(smoothstep(0.22, 0.78, brightCell) * 0.68 + m * 0.65 + assembling * 0.55, 0.0, 1.0);
+  vec3 dotColor = mix(uInk, uAccent, accentMix);
+
+  // Alguns micro-pontos de telemetria em teal/índigo no halo (estilo ref_hero-02/03)
+  if (h > 0.94 && (a < 0.55 || m > 0.2)) {
+    dotColor = mix(uAccent, uTeal, step(0.5, rnd.y));
+  }
+
+  // Alpha final combinando os dots circulares nítidos + base de clareza facial
+  float dotAlpha = dotMask * mix(0.38, 0.96, darkness) * clamp(a * 1.15 + 0.25, 0.0, 1.0);
+  if (a < 0.15) {
+    dotAlpha = dotMask * 0.45 * (1.0 - assembling);
+  }
+
+  float finalAlpha = clamp(max(dotAlpha, subtlePhoto), 0.0, 1.0);
+  if (finalAlpha < 0.01) discard;
+
+  vec3 finalColor = mix(dotColor, mix(uInk, uAccent, 0.25), subtlePhoto * 0.5);
+  gl_FragColor = vec4(finalColor * finalAlpha, finalAlpha);
 }
 `;
-
-const GLYPHS = ' .:-=+*#%@';
 
 type Opts = {
   src: string;
@@ -98,19 +154,6 @@ type Opts = {
 function hexToVec3(hex: string): [number, number, number] {
   const n = parseInt(hex.replace('#', ''), 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
-}
-
-function buildAtlas(size: number): HTMLCanvasElement {
-  const c = document.createElement('canvas');
-  c.width = size * GLYPHS.length;
-  c.height = size;
-  const ctx = c.getContext('2d')!;
-  ctx.fillStyle = '#fff';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = `600 ${Math.round(size * 0.92)}px GeistMono, ui-monospace, monospace`;
-  for (let i = 0; i < GLYPHS.length; i++) ctx.fillText(GLYPHS[i], i * size + size / 2, size * 0.54);
-  return c;
 }
 
 function compile(gl: WebGLRenderingContext, type: number, src: string) {
@@ -148,7 +191,7 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  // Carrega imagem de forma resiliente no mobile (onload + decode opcional) e fonte em paralelo
+  // Carrega imagem de forma resiliente no mobile (onload + decode opcional)
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.decoding = 'async';
@@ -159,12 +202,9 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
     if (img.complete && img.naturalWidth > 0) resolve();
   }).then(() => (img.decode ? img.decode().catch(() => null) : null));
 
-  await Promise.all([
-    imgReady,
-    document.fonts?.load('600 40px GeistMono').catch(() => null),
-  ]);
+  await imgReady;
 
-  // Programa
+  // Programa WebGL
   const prog = gl.createProgram()!;
   gl.attachShader(prog, compile(gl, gl.VERTEX_SHADER, VERT));
   gl.attachShader(prog, compile(gl, gl.FRAGMENT_SHADER, FRAG));
@@ -179,19 +219,17 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
   texture(gl, img, 0);
-  texture(gl, buildAtlas(64), 1);
 
   const U = (n: string) => gl.getUniformLocation(prog, n);
   const u = {
-    img: U('uImg'), atlas: U('uAtlas'), res: U('uRes'), cell: U('uCell'), rect: U('uRect'),
+    img: U('uImg'), res: U('uRes'), cell: U('uCell'), rect: U('uRect'),
     mouse: U('uMouse'), mouseAmt: U('uMouseAmt'), time: U('uTime'), reveal: U('uReveal'),
-    glyphs: U('uGlyphs'), ink: U('uInk'), accent: U('uAccent'),
+    ink: U('uInk'), accent: U('uAccent'), teal: U('uTeal'),
   };
   gl.uniform1i(u.img, 0);
-  gl.uniform1i(u.atlas, 1);
-  gl.uniform1f(u.glyphs, GLYPHS.length);
   gl.uniform3fv(u.ink, hexToVec3('#14141F'));
   gl.uniform3fv(u.accent, hexToVec3('#4F46E5'));
+  gl.uniform3fv(u.teal, hexToVec3('#0D9488'));
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   gl.clearColor(0, 0, 0, 0);
@@ -209,7 +247,7 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
 
   function layout() {
     const r = canvas.getBoundingClientRect();
-    state.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    state.dpr = Math.min(window.devicePixelRatio || 1, 1.75);
     state.w = Math.max(1, Math.round(r.width * state.dpr));
     state.h = Math.max(1, Math.round(r.height * state.dpr));
     canvas.width = state.w;
@@ -217,7 +255,8 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
     gl!.viewport(0, 0, state.w, state.h);
     gl!.uniform2f(u.res, state.w, state.h);
     const mobile = window.innerWidth < 768;
-    gl!.uniform1f(u.cell, (mobile ? 5.5 : 8) * state.dpr);
+    // Grade fina de pontos (dots) para alta nitidez fisionômica
+    gl!.uniform1f(u.cell, (mobile ? 3.8 : 4.4) * state.dpr);
   }
 
   function rect(): [number, number, number, number] {
@@ -229,8 +268,6 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
       iw = w * (mobile ? 0.96 : 0.6);
       ih = iw / aspect;
     }
-    // No recorte original (guedes_ai_grande.webp), o centro visual do rosto/tronco está em ~54% da largura.
-    // Compensamos no mobile (0.46) para que o retrato fique perfeitamente centralizado no eixo X.
     const cx = mobile ? w * 0.465 : w * (opts.anchorX ?? 0.68);
     const x = cx - iw / 2 + state.ppx * state.dpr;
     const y = mobile ? (h - ih) * 0.5 : h - ih;

@@ -1,6 +1,7 @@
 ---
 import { type Lang } from '../i18n';
 import { CONSULTORIA_DATA } from '../data/consultoria';
+import Icon from './Icon.astro';
 
 interface Props {
   lang: Lang;
@@ -8,17 +9,376 @@ interface Props {
 
 const { lang } = Astro.props;
 const data = CONSULTORIA_DATA[lang];
+const isPt = lang === 'pt';
+
+const territories = isPt
+  ? [
+      {
+        icon: 'Compass' as const,
+        accent: '#4F46E5',
+        tag: 'Território Estratégico',
+        title: 'Estratégia & Execução',
+        desc: 'Planejamento estratégico (da revisão da intenção à execução técnica), governança da execução e Strategy Execution Sprint.',
+        items: [
+          'Planejamento estratégico da intenção à execução técnica',
+          'Governança da execução e ritos de acompanhamento',
+          'Strategy Execution Sprint e destravamento de prioridades',
+        ],
+      },
+      {
+        icon: 'Cpu' as const,
+        accent: '#0D9488',
+        tag: 'Prioridade Executiva · Parceria FIA Business School',
+        title: 'IA & Transformação',
+        desc: 'AI Adoption & Value Diagnostic, portfólio de casos de uso, business case e acompanhamento da geração de valor, governança e operating model de IA.',
+        highlightTitle: 'Da experimentação ao valor',
+        highlightText:
+          'O trabalho conjunto com as lideranças técnicas e do negócio encaminha a identificação de casos de uso da IA com foco na criação responsável de valor. A análise do negócio, da arquitetura tecnológica e dos dados disponíveis é o fundamento para o projeto dos pilotos. A Consultoria elabora os business cases, estabelece a governança e apoia decisivamente o desenvolvimento das capacidades humanas e técnicas necessárias para escalar a adoção — em parceria com a FIA Business School.',
+        items: [
+          'AI Adoption & Value Diagnostic',
+          'Portfólio de casos de uso e arquitetura de pilotos',
+          'Business case, ROI e acompanhamento da geração de valor',
+          'Governança, risco e operating model de IA',
+        ],
+      },
+      {
+        icon: 'Network' as const,
+        accent: '#6366F1',
+        tag: 'Arquitetura & Capacidades',
+        title: 'Organização & Liderança',
+        desc: 'Modelo de gestão (governança da decisão, incentivos, papéis e responsabilidades das estruturas de gestão), governança corporativa e compliance, capacidades organizacionais e desenvolvimento de lideranças.',
+        items: [
+          'Modelo de gestão: governança da decisão, alçadas e incentivos',
+          'Papéis, responsabilidades e interfaces das estruturas de gestão',
+          'Governança corporativa, integridade e compliance',
+          'Desenvolvimento de lideranças para conduzir a execução das mudanças',
+        ],
+      },
+    ]
+  : [
+      {
+        icon: 'Compass' as const,
+        accent: '#4F46E5',
+        tag: 'Strategic Territory',
+        title: 'Strategy & Execution',
+        desc: 'Strategic planning (from strategic intent review to technical execution), execution governance, and Strategy Execution Sprint.',
+        items: [
+          'End-to-end strategic planning from intent to technical execution',
+          'Execution governance and executive tracking cadences',
+          'Strategy Execution Sprint and priority alignment',
+        ],
+      },
+      {
+        icon: 'Cpu' as const,
+        accent: '#0D9488',
+        tag: 'Executive Priority · FIA Business School Partnership',
+        title: 'AI & Transformation',
+        desc: 'AI Adoption & Value Diagnostic, use-case portfolio, business case and value-capture tracking, AI governance and operating model.',
+        highlightTitle: 'From experimentation to value',
+        highlightText:
+          'Joint work with technical and business leaders drives the identification of AI use cases focused on responsible value creation. Analyzing the business, technology architecture, and available data forms the foundation for pilot design. The practice builds the business cases, establishes governance, and decisively supports the development of human and technical capabilities required to scale adoption — in partnership with FIA Business School.',
+        items: [
+          'AI Adoption & Value Diagnostic',
+          'Prioritized use-case portfolio and pilot design',
+          'Business case, value tracking, and ROI governance',
+          'AI governance and operating model',
+        ],
+      },
+      {
+        icon: 'Network' as const,
+        accent: '#6366F1',
+        tag: 'Architecture & Capabilities',
+        title: 'Organization & Leadership',
+        desc: 'Management model (decision governance, incentives, roles and responsibilities across management structures), corporate governance and compliance, organizational capabilities, and leadership development.',
+        items: [
+          'Management model: decision rights, incentives, and structures',
+          'Roles, responsibilities, and cross-unit interfaces',
+          'Corporate governance and compliance',
+          'Leadership development to lead change execution',
+        ],
+      },
+    ];
+
+const interventions = isPt
+  ? [
+      { icon: 'Search' as const, title: 'Diagnóstico & Advisory', desc: 'Leitura independente de cenário, maturidade e escolhas críticas para o C-level e conselho.' },
+      { icon: 'Zap' as const, title: 'Sprint', desc: 'Ciclos executivos intensivos de curta duração para destravar decisões, estratégia ou casos de uso de IA.' },
+      { icon: 'Layers' as const, title: 'Projeto Estruturante', desc: 'Redesenho completo de estratégia, modelo de gestão, processos, governança ou transformação com IA.' },
+      { icon: 'GraduationCap' as const, title: 'Programa Executivo', desc: 'Desenvolvimento gerencial customizado com chancela FIA Business School para liderar a mudança.' },
+      { icon: 'Users' as const, title: 'Workshop', desc: 'Imersões práticas de alinhamento estratégico, priorização executiva e letramento decisório em IA.' },
+      { icon: 'Compass' as const, title: 'Guidance & Operação Assistida', desc: 'Acompanhamento contínuo da implementação, governança de valor e transferência de conhecimento.' },
+    ]
+  : [
+      { icon: 'Search' as const, title: 'Diagnostic & Advisory', desc: 'Independent reading of scenario, maturity, and critical choices for C-level and board.' },
+      { icon: 'Zap' as const, title: 'Sprint', desc: 'Short, high-intensity executive cycles to unlock strategic decisions or AI use cases.' },
+      { icon: 'Layers' as const, title: 'Structuring Project', desc: 'Full redesign of strategy, management model, processes, governance, or AI transformation.' },
+      { icon: 'GraduationCap' as const, title: 'Executive Program', desc: 'Custom leadership development in partnership with FIA Business School to sustain execution.' },
+      { icon: 'Users' as const, title: 'Workshop', desc: 'Hands-on executive alignment, prioritization, and AI decision-making immersions.' },
+      { icon: 'Compass' as const, title: 'Guidance & Assisted Operation', desc: 'Ongoing implementation guidance, value governance, and team knowledge transfer.' },
+    ];
+
+const cases = isPt
+  ? [
+      {
+        territory: 'Estratégia & Execução',
+        sector: 'Setor Privado · Grande Empresa Regulada',
+        accent: '#4F46E5',
+        problem: 'Desconexão entre a ambição estratégica de longo prazo e a capacidade real de execução das diretorias, gerando pulverização de iniciativas e lentidão decisória.',
+        challenges: 'Ambiente altamente regulado, múltiplos stakeholders internos e fadiga de projetos sem critério claro de priorização ou descontinuidade.',
+        project: 'Diagnóstico estratégico integrado, revisão do direcionamento plurianual, síntese executiva de prioridades (Parar / Continuar / Iniciar) e implantação de governança da execução.',
+        results: 'Foco executivo restaurado com corte de iniciativas de baixo retorno, alinhamento entre diretorias e ganho de velocidade na entrega das prioridades críticas do negócio.',
+        quote: 'Guedes reúne uma combinação rara de profundidade técnica e visão executiva para decisões fundamentadas em dados e ciência.',
+      },
+      {
+        territory: 'IA & Transformação',
+        sector: 'Setor Privado · Operação Intensiva em Dados e Tecnologia',
+        accent: '#0D9488',
+        problem: 'Multiplicação de experimentos isolados de IA sem business case estruturado, governança de risco ou integração com os processos críticos de negócio.',
+        challenges: 'Necessidade de sair do hype tecnológico para captura real de eficiência operacional, mantendo segurança, supervisão humana e capacitação das lideranças.',
+        project: 'AI Adoption & Value Diagnostic, priorização de portfólio de casos de uso com análise da arquitetura de dados, modelagem de business case e programa de desenvolvimento gerencial com chancela FIA.',
+        results: 'Transição estruturada da experimentação para geração de valor mensurável, com operating model de IA definido, redução de retrabalho operacional e líderes capacitados.',
+        quote: 'Capacidade ímpar de transformar o complexo em uma narrativa clara, acionável e orientada a resultado.',
+      },
+      {
+        territory: 'Organização & Liderança',
+        sector: 'Alta Complexidade · Grande Organização Multi-Stakeholder',
+        accent: '#6366F1',
+        problem: 'Estrutura organizacional e modelo de gestão defasados frente ao crescimento da operação, causando sobreposição de escopo, atrito entre áreas e gargalos na alta administração.',
+        challenges: 'Cultura organizacional consolidada, alta interdependência técnica entre unidades e necessidade de preservar a continuidade operacional durante a transição.',
+        project: 'Redesign da cadeia de valor e macroprocessos, revisão da estrutura organizacional, novo modelo de governança decisória e trilha de desenvolvimento de lideranças.',
+        results: 'Clareza de papéis, alçadas e interfaces entre unidades, destravamento da tomada de decisão executiva e fortalecimento da accountability em toda a liderança.',
+        quote: 'Visão pragmática com soluções bem encaminhadas que conectam estratégia, pessoas e governança.',
+      },
+    ]
+  : [
+      {
+        territory: 'Strategy & Execution',
+        sector: 'Private Sector · Large Regulated Enterprise',
+        accent: '#4F46E5',
+        problem: 'Disconnect between long-term strategic ambition and actual execution capacity across business units, leading to fragmented initiatives and slow decisions.',
+        challenges: 'Highly regulated environment, multiple stakeholders, and project fatigue without clear stop/continue/start criteria.',
+        project: 'Integrated strategic diagnostic, multi-year direction review, executive priority synthesis (Stop / Continue / Start), and execution governance implementation.',
+        results: 'Restored executive focus by eliminating low-return initiatives, aligning leadership teams, and accelerating delivery of mission-critical priorities.',
+        quote: 'A rare combination of technical depth and executive vision for data- and science-driven decisions.',
+      },
+      {
+        territory: 'AI & Transformation',
+        sector: 'Private Sector · Technology & Data-Intensive Operation',
+        accent: '#0D9488',
+        problem: 'Isolated AI experiments lacking structured business cases, risk governance, or integration with core business processes.',
+        challenges: 'Moving beyond technological hype to capture real operational efficiency while ensuring human oversight, governance, and leadership readiness.',
+        project: 'AI Adoption & Value Diagnostic, prioritized use-case portfolio grounded in data architecture, business-case modeling, and FIA-certified leadership enablement.',
+        results: 'Structured transition from experimentation to measurable value capture, with a clear AI operating model, reduced rework, and capable leadership.',
+        quote: 'Unique ability to turn complexity into a clear, actionable, results-oriented roadmap.',
+      },
+      {
+        territory: 'Organization & Leadership',
+        sector: 'High Complexity · Multi-Stakeholder Institution',
+        accent: '#6366F1',
+        problem: 'Legacy organizational structure and management model creating scope overlap, cross-functional friction, and C-level decision bottlenecks.',
+        challenges: 'Deeply established culture, high technical interdependence across units, and need for seamless operational continuity during transition.',
+        project: 'Value-chain and macroprocess redesign, organizational structure review, new decision-governance architecture, and leadership development program.',
+        results: 'Clear mandates, decision rights, and cross-unit interfaces, faster executive decision-making, and stronger organizational accountability.',
+        quote: 'Pragmatic vision with well-structured solutions connecting strategy, people, and governance.',
+      },
+    ];
+
+const buyingSteps = isPt
+  ? ['Executive Session', 'Workshop', 'Diagnóstico & Advisory', 'Sprint', 'Projeto', 'Operação Assistida']
+  : ['Executive Session', 'Workshop', 'Diagnostic & Advisory', 'Sprint', 'Project', 'Assisted Operation'];
+
+const actingFlow = isPt
+  ? ['Diagnóstico', 'Estruturação', 'Implementação', 'Transferência de conhecimento para as equipes']
+  : ['Diagnosis', 'Structuring', 'Implementation', 'Knowledge transfer to internal teams'];
 ---
 
 <section class="section consultoria" id="consultoria" aria-labelledby="consultoria-h2">
   <div class="container">
+    <!-- ── 1. HEADER & POSICIONAMENTO ── -->
     <header class="consultoria__head" data-reveal>
       <div class="consultoria__head-main">
         <span class="eyebrow">{data.eyebrow}</span>
         <h2 class="h2 consultoria__title" id="consultoria-h2">{data.h2}</h2>
       </div>
-      <p class="lead consultoria__lead">{data.lead}</p>
+      <div class="consultoria__head-side">
+        <p class="lead consultoria__lead">{data.lead}</p>
+        <div class="consultoria__intersection" aria-label={isPt ? 'Interseção de atuação' : 'Core intersection'}>
+          {(isPt
+            ? ['IA', 'Estratégia', 'Organização', 'Liderança', 'Execução']
+            : ['AI', 'Strategy', 'Organization', 'Leadership', 'Execution']
+          ).map((tag, i) => (
+            <>
+              {i > 0 && <span class="consultoria__plus" aria-hidden="true">+</span>}
+              <span class="consultoria__inter-chip font-mono">{tag}</span>
+            </>
+          ))}
+        </div>
+      </div>
     </header>
+
+    <!-- ── 2. OS 3 TERRITÓRIOS DA CONSULTORIA ESTRATÉGICA ── -->
+    <div class="territories" data-reveal>
+      <div class="territories__grid">
+        {territories.map((t) => (
+          <article class="tcard" style={`--t-accent: ${t.accent}`}>
+            <div class="tcard__top">
+              <span class="tcard__icon">
+                <Icon name={t.icon} size={20} stroke={1.75} />
+              </span>
+              <span class="tcard__tag font-mono">{t.tag}</span>
+            </div>
+
+            <h3 class="tcard__title">{t.title}</h3>
+            <p class="tcard__desc">{t.desc}</p>
+
+            {t.highlightTitle && (
+              <div class="tcard__ia-box">
+                <span class="tcard__ia-badge font-mono">
+                  <Icon name="Sparkles" size={13} stroke={2} />
+                  {t.highlightTitle}
+                </span>
+                <p class="tcard__ia-text">{t.highlightText}</p>
+              </div>
+            )}
+
+            <ul class="tcard__list">
+              {t.items.map((it) => (
+                <li>
+                  <Icon name="Check" size={15} stroke={2.2} class="tcard__check" />
+                  <span>{it}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <!-- ── 3. FORMAS DE INTERVENÇÃO & COMO COMPRAR ── -->
+    <div class="intervencao-block" data-reveal>
+      <div class="intervencao-block__head">
+        <div>
+          <span class="eyebrow">{isPt ? 'FORMAS DE INTERVENÇÃO' : 'ENGAGEMENT FORMATS'}</span>
+          <h3 class="h3 intervencao-block__title">
+            {isPt
+              ? 'Nem todo problema exige começar por um grande projeto.'
+              : 'Not every challenge requires starting with a massive project.'}
+          </h3>
+        </div>
+        <p class="intervencao-block__sub">
+          {isPt
+            ? 'Podemos iniciar por uma sessão executiva, workshop ou diagnóstico focal e ampliar a intervenção somente quando problema, evidência e valor justificarem.'
+            : 'We can start with an executive session, workshop, or focused diagnostic, expanding the intervention only when problem, evidence, and value justify it.'}
+        </p>
+      </div>
+
+      <div class="intervencao__grid">
+        {interventions.map((item) => (
+          <div class="icard">
+            <div class="icard__icon">
+              <Icon name={item.icon} size={18} stroke={1.75} />
+            </div>
+            <h4 class="icard__title">{item.title}</h4>
+            <p class="icard__desc">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      <!-- Escada de Contratação ("Como comprar" & "Como atuamos") -->
+      <div class="buying-journey">
+        <div class="buying-journey__row">
+          <span class="buying-journey__label font-mono">
+            {isPt ? 'Formas de começar:' : 'Ways to start:'}
+          </span>
+          <div class="buying-journey__steps">
+            {buyingSteps.map((step, idx) => (
+              <>
+                {idx > 0 && <span class="buying-journey__arrow" aria-hidden="true">→</span>}
+                <span class="buying-journey__pill">{step}</span>
+              </>
+            ))}
+          </div>
+        </div>
+
+        <div class="buying-journey__row buying-journey__row--acting">
+          <span class="buying-journey__label font-mono">
+            {isPt ? 'Como atuamos:' : 'How we work:'}
+          </span>
+          <div class="buying-journey__steps">
+            {actingFlow.map((step, idx) => (
+              <>
+                {idx > 0 && <span class="buying-journey__arrow" aria-hidden="true">→</span>}
+                <span class="buying-journey__flow-item">{step}</span>
+              </>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. EXPERIÊNCIA SELECIONADA EM CONSULTORIA (3 MINI-CASES) ── -->
+    <div class="cases-block" data-reveal>
+      <div class="cases-block__head">
+        <div>
+          <span class="eyebrow">{isPt ? 'EVIDÊNCIA DE CAPACIDADE' : 'PROVEN TRACK RECORD'}</span>
+          <h3 class="h3 cases-block__title">
+            {isPt ? 'Experiência selecionada em consultoria' : 'Selected consulting experience'}
+          </h3>
+        </div>
+        <p class="cases-block__sub">
+          {isPt
+            ? 'Setor privado como mercado-alvo prioritário e setor público como evidência de capacidade em ambientes regulados, intensivos em tecnologia e múltiplos stakeholders.'
+            : 'Private sector as priority target market and public sector as proof of capability in regulated, technology-intensive, multi-stakeholder environments.'}
+        </p>
+      </div>
+
+      <div class="cases__grid">
+        {cases.map((c) => (
+          <article class="case-card" style={`--c-accent: ${c.accent}`}>
+            <div class="case-card__head">
+              <span class="case-card__territory font-mono">{c.territory}</span>
+              <span class="case-card__sector">{c.sector}</span>
+            </div>
+
+            <div class="case-card__item">
+              <span class="case-card__label font-mono">{isPt ? 'Tipo de problema' : 'Problem type'}</span>
+              <p class="case-card__text">{c.problem}</p>
+            </div>
+
+            <div class="case-card__item">
+              <span class="case-card__label font-mono">{isPt ? 'Desafios e particularidades' : 'Challenges & specifics'}</span>
+              <p class="case-card__text">{c.challenges}</p>
+            </div>
+
+            <div class="case-card__item">
+              <span class="case-card__label font-mono">{isPt ? 'Projeto executado' : 'Project delivered'}</span>
+              <p class="case-card__text">{c.project}</p>
+            </div>
+
+            <div class="case-card__item case-card__item--result">
+              <span class="case-card__label font-mono">{isPt ? 'Resultados alcançados' : 'Results achieved'}</span>
+              <p class="case-card__text">{c.results}</p>
+            </div>
+
+            <blockquote class="case-card__quote">
+              <p>"{c.quote}"</p>
+            </blockquote>
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <!-- ── 5. CATÁLOGO DETALHADO DE PRODUTOS (2 EIXOS INTERATIVOS) ── -->
+    <div class="portfolio-subheader" data-reveal>
+      <div>
+        <span class="eyebrow">{isPt ? 'ARQUITETURA DE SOLUÇÕES E ENTREGÁVEIS' : 'SOLUTIONS & DELIVERABLES ARCHITECTURE'}</span>
+        <h3 class="h3">{isPt ? 'Explore o portfólio completo de produtos de consultoria' : 'Explore the complete consulting product portfolio'}</h3>
+      </div>
+      <a href="#contato" class="btn">
+        {isPt ? 'Converse sobre um desafio' : 'Discuss a strategic challenge'}
+        <Icon name="ArrowRight" size={18} stroke={2} />
+      </a>
+    </div>
 
     <div class="consultoria__grid">
       {data.offers.map((offer, idx) => (
@@ -127,26 +487,396 @@ const data = CONSULTORIA_DATA[lang];
     border-bottom: 1px solid var(--line);
   }
 
+  .h3 {
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.15rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+
   .consultoria__head {
     display: grid;
     gap: 1.5rem;
-    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
   }
   .consultoria__title {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
     max-width: 24ch;
+  }
+  .consultoria__head-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    align-self: end;
   }
   .consultoria__lead {
     max-width: 54ch;
-    align-self: end;
+    color: var(--ink-2);
+    font-size: var(--fs-lg);
+    line-height: 1.55;
+  }
+  .consultoria__intersection {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .consultoria__inter-chip {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+  }
+  .consultoria__plus {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.85rem;
   }
 
   @media (min-width: 960px) {
     .consultoria__head {
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1.1fr 0.9fr;
       align-items: end;
       gap: 3rem;
     }
+  }
+
+  /* ── 3 Territórios da Consultoria ── */
+  .territories {
+    margin-bottom: clamp(3.5rem, 6vw, 5rem);
+  }
+  .territories__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .territories__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .tcard {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--t-accent);
+    border-radius: var(--radius);
+    padding: 1.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), border-color 0.3s;
+  }
+  .tcard:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .tcard__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .tcard__icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--t-accent) 10%, transparent);
+    color: var(--t-accent);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .tcard__tag {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    text-align: right;
+  }
+  .tcard__title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .tcard__desc {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .tcard__ia-box {
+    background: color-mix(in srgb, var(--t-accent) 6%, var(--bg-soft));
+    border: 1px solid color-mix(in srgb, var(--t-accent) 24%, var(--line));
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.1rem;
+  }
+  .tcard__ia-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--t-accent);
+    margin-bottom: 0.4rem;
+  }
+  .tcard__ia-text {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .tcard__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .tcard__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 0.85rem;
+    color: var(--ink-2);
+    line-height: 1.45;
+  }
+  .tcard__list :global(.tcard__check) {
+    color: var(--t-accent);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  /* ── Formas de Intervenção & Como Comprar ── */
+  .intervencao-block {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: clamp(1.75rem, 4vw, 3rem);
+    margin-bottom: clamp(3.5rem, 6vw, 5rem);
+    box-shadow: var(--shadow-sm);
+  }
+  .intervencao-block__head {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  @media (min-width: 900px) {
+    .intervencao-block__head {
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: end;
+      gap: 2.5rem;
+    }
+  }
+  .intervencao-block__sub {
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .intervencao__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .icard {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    transition: border-color 0.25s, background-color 0.25s;
+  }
+  .icard:hover {
+    border-color: var(--primary);
+    background: var(--surface);
+  }
+  .icard__icon {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: grid;
+    place-items: center;
+    margin-bottom: 0.75rem;
+  }
+  .icard__title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+  }
+  .icard__desc {
+    font-size: 0.84rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .buying-journey {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+  .buying-journey__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .buying-journey__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    min-width: 155px;
+  }
+  .buying-journey__steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .buying-journey__pill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.32rem 0.8rem;
+    border-radius: var(--radius-pill);
+    background: var(--primary-soft);
+    color: var(--primary);
+    border: 1px solid hsl(243 75% 59% / 0.22);
+  }
+  .buying-journey__flow-item {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .buying-journey__arrow {
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+
+  /* ── 3 Cases Selecionados ── */
+  .cases-block {
+    margin-bottom: clamp(3.5rem, 6vw, 5rem);
+  }
+  .cases-block__head {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  @media (min-width: 900px) {
+    .cases-block__head {
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: end;
+      gap: 2.5rem;
+    }
+  }
+  .cases-block__sub {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+  .cases__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .cases__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .case-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .case-card__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .case-card__territory {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-accent);
+  }
+  .case-card__sector {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .case-card__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .case-card__label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+  }
+  .case-card__text {
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .case-card__item--result {
+    background: color-mix(in srgb, var(--c-accent) 6%, var(--bg-soft));
+    border-left: 3px solid var(--c-accent);
+    padding: 0.75rem 0.9rem;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .case-card__item--result .case-card__label {
+    color: var(--c-accent);
+  }
+  .case-card__item--result .case-card__text {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .case-card__quote {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px dashed var(--line);
+    font-size: 0.82rem;
+    font-style: italic;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+
+  /* ── Subheader do Portfólio ── */
+  .portfolio-subheader {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .consultoria__grid {
@@ -165,7 +895,7 @@ const data = CONSULTORIA_DATA[lang];
     position: relative;
     display: flex;
     flex-direction: column;
-    background: var(--bg-elev);
+    background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -260,7 +990,7 @@ const data = CONSULTORIA_DATA[lang];
     stroke-width: 1;
   }
   .ccard__iso-node {
-    fill: var(--bg-elev);
+    fill: var(--surface);
     stroke: var(--card-accent);
     stroke-width: 1.5;
     transition: transform 0.65s var(--ease-out), fill 0.35s ease;
@@ -321,11 +1051,11 @@ const data = CONSULTORIA_DATA[lang];
   }
 
   /* Stage HUD bars */
-  .ccard__hud-top,
   .ccard__hud-bottom {
     position: absolute;
     left: 1.15rem;
     right: 1.15rem;
+    bottom: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -335,40 +1065,6 @@ const data = CONSULTORIA_DATA[lang];
     color: var(--ink-3);
     pointer-events: none;
     z-index: 3;
-  }
-  .ccard__hud-top { top: 0.9rem; }
-  .ccard__hud-bottom { bottom: 0.85rem; }
-
-  .ccard__hud-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.22rem 0.55rem;
-    border-radius: var(--radius-pill);
-    background: hsl(0 0% 100% / 0.85);
-    border: 1px solid var(--line);
-    color: var(--ink-2);
-    backdrop-filter: blur(6px);
-  }
-  .ccard__hud-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--card-accent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--card-accent) 20%, transparent);
-    transition: transform 0.3s ease;
-  }
-  .ccard:hover .ccard__hud-dot {
-    transform: scale(1.25);
-  }
-
-  .ccard__hud-coord {
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    background: hsl(0 0% 100% / 0.75);
-    border: 1px solid var(--line);
-    color: var(--card-accent);
-    font-weight: 600;
   }
 
   .ccard__hud-status {
@@ -389,32 +1085,6 @@ const data = CONSULTORIA_DATA[lang];
     flex: 1;
     padding: clamp(1.5rem, 3vw, 2.25rem);
     pointer-events: none;
-  }
-
-  .ccard__meta {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    margin-bottom: 0.9rem;
-  }
-  .ccard__num {
-    display: inline-grid;
-    place-items: center;
-    width: 1.85rem;
-    height: 1.85rem;
-    border-radius: 50%;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--card-accent);
-    background: color-mix(in srgb, var(--card-accent) 10%, transparent);
-    border: 1px solid color-mix(in srgb, var(--card-accent) 24%, transparent);
-  }
-  .ccard__axis {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink-3);
   }
 
   .ccard__title {
@@ -449,7 +1119,7 @@ const data = CONSULTORIA_DATA[lang];
     gap: 0.65rem;
     width: 100%;
     padding: 0.55rem 0.85rem;
-    border-radius: var(--radius-xs);
+    border-radius: var(--radius-sm);
     background: var(--bg-soft);
     border: 1px solid var(--line);
     font-size: 0.82rem;
@@ -470,18 +1140,8 @@ const data = CONSULTORIA_DATA[lang];
   .ccard__chip-name {
     font-weight: 500;
   }
-      transform 0.22s var(--ease-out);
-  }
-  .ccard__chip-num {
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: var(--card-accent);
-  }
-  .ccard__chip-name {
-    font-weight: 500;
-  }
   .ccard__chip:hover {
-    background: color-mix(in srgb, var(--card-accent) 8%, var(--bg-elev));
+    background: color-mix(in srgb, var(--card-accent) 8%, var(--surface));
     border-color: color-mix(in srgb, var(--card-accent) 40%, var(--line));
     color: var(--ink);
     transform: translateY(-2px);
@@ -512,7 +1172,7 @@ const data = CONSULTORIA_DATA[lang];
     height: 2.25rem;
     border-radius: 50%;
     border: 1px solid var(--line-strong);
-    background: var(--bg-elev);
+    background: var(--surface);
     color: var(--ink);
     transition:
       background-color 0.3s var(--ease-out),
@@ -542,7 +1202,6 @@ const data = CONSULTORIA_DATA[lang];
       const stage = card.querySelector<HTMLElement>('[data-stage]');
       const reticle = card.querySelector<SVGGElement>('[data-reticle]');
 
-      // Stage click navigates to offer href
       const mainLink = card.querySelector<HTMLAnchorElement>('.ccard__MainLink');
       stage?.addEventListener('click', () => {
         if (mainLink?.href) window.location.href = mainLink.href;
@@ -602,15 +1261,12 @@ const data = CONSULTORIA_DATA[lang];
         }
       });
 
-      // Nodes for Card 01 (Complexity -> Structured Governance Matrix)
       const nodes = Array.from({ length: 24 }, (_, i) => {
         const col = i % 6;
         const row = Math.floor(i / 6);
         return {
-          // Scattered organic state
           sx: 0.12 + ((i * 37) % 76) / 100,
           sy: 0.18 + ((i * 53) % 64) / 100,
-          // Structured governance grid state
           gx: 0.18 + (col / 5) * 0.64,
           gy: 0.24 + (row / 3) * 0.52,
           phase: i * 0.45,
@@ -634,7 +1290,6 @@ const data = CONSULTORIA_DATA[lang];
           const cx = mx * width;
           const cy = my * height;
 
-          // Compute current node positions interpolating between organic drift and structured governance grid
           const pts = nodes.map((n) => {
             const driftX = Math.sin(t + n.phase) * 0.022 * (1 - orderFactor * 0.7);
             const driftY = Math.cos(t * 0.9 + n.phase) * 0.022 * (1 - orderFactor * 0.7);
@@ -643,7 +1298,6 @@ const data = CONSULTORIA_DATA[lang];
             return { x, y, r: n.r };
           });
 
-          // Draw subtle network edges
           ctx.lineWidth = 1;
           for (let i = 0; i < pts.length; i++) {
             for (let j = i + 1; j < pts.length; j++) {
@@ -662,7 +1316,6 @@ const data = CONSULTORIA_DATA[lang];
             }
           }
 
-          // Draw nodes & cursor alignment vectors
           pts.forEach((p) => {
             const dCursor = Math.hypot(p.x - cx, p.y - cy);
             if (hovered && dCursor < 130) {
@@ -680,7 +1333,6 @@ const data = CONSULTORIA_DATA[lang];
             ctx.fill();
           });
         } else {
-          // Card 02: Operational Efficiency & Applied Intelligence (Signal bars + harmonic wave)
           const bars = 38;
           const padX = 28;
           const usableW = Math.max(10, width - padX * 2);
@@ -688,7 +1340,6 @@ const data = CONSULTORIA_DATA[lang];
           const midY = height * 0.52;
           const focusX = mx * width;
 
-          // Draw vertical telemetry bars
           for (let i = 0; i < bars; i++) {
             const x = padX + i * step;
             const distFromFocus = Math.abs(x - focusX) / (width * 0.35);
@@ -709,7 +1360,6 @@ const data = CONSULTORIA_DATA[lang];
             ctx.lineTo(x, midY + barHalf);
             ctx.stroke();
 
-            // Peak dot on top of active bars
             if (focusBoost > 0.45) {
               ctx.fillStyle = '#0D9488';
               ctx.beginPath();
@@ -718,7 +1368,6 @@ const data = CONSULTORIA_DATA[lang];
             }
           }
 
-          // Continuous AI prediction spline across stage
           ctx.strokeStyle = `rgba(13, 148, 136, ${(0.45 + orderFactor * 0.4).toFixed(2)})`;
           ctx.lineWidth = 1.6;
           ctx.beginPath();
@@ -755,4 +1404,3 @@ const data = CONSULTORIA_DATA[lang];
 
   initConsultoriaCards();
 </script>
-

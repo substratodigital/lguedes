@@ -47,9 +47,8 @@ const resolveHref = (href: string) =>
 
 <div class="mmenu" id="mobile-menu" hidden>
   <nav class="mmenu__list" aria-label="Menu mobile">
-    {t.nav.links.map((l, i) => (
+    {t.nav.links.map((l) => (
       <a href={resolveHref(l.href)} class="mmenu__item" data-mmenu-item>
-        <span class="mmenu__num font-mono">{String(i + 1).padStart(2, '0')}</span>
         <span class="mmenu__label">{l.name}</span>
         <span class="mmenu__arrow" aria-hidden="true">→</span>
       </a>

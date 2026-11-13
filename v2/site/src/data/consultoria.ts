@@ -66,9 +66,9 @@ export const CONSULTORIA_DATA: Record<Lang, {
   offers: [ConsultoriaOffer, ConsultoriaOffer];
 }> = {
   pt: {
-    eyebrow: 'PORTFÓLIO DE CONSULTORIA',
-    h2: 'Arquitetura estratégica e inteligência aplicada para decisões de alto impacto',
-    lead: 'Mais de 30 projetos conduzidos junto a grandes corporações e órgãos públicos, combinando o rigor científico da FEA/USP e a chancela metodológica FIA com execução pragmática orientada a valor.',
+    eyebrow: 'CONSULTORIA ESTRATÉGICA — NÚCLEO DA OFERTA',
+    h2: 'Por que contratar Luís Guedes para um problema estratégico',
+    lead: 'Apoiar empresas e suas lideranças a transformar mudanças estratégicas e tecnológicas em decisões, capacidades organizacionais, modelos de gestão e execução inteligente.',
     cardCta: 'Explorar soluções e entregáveis',
     solutionsCountLabel: 'produtos especializados',
     backHomeLabel: 'Voltar para o início',
@@ -405,9 +405,9 @@ export const CONSULTORIA_DATA: Record<Lang, {
   },
 
   en: {
-    eyebrow: 'CONSULTING PORTFOLIO',
-    h2: 'Strategic architecture and applied intelligence for high-impact decisions',
-    lead: 'Over 30 consulting engagements delivered for major corporations and public institutions, combining FEA/USP scientific rigor and FIA methodological excellence with pragmatic, value-driven execution.',
+    eyebrow: 'STRATEGIC CONSULTING — CORE PRACTICE',
+    h2: 'Why hire Luís Guedes for a strategic challenge',
+    lead: 'Supporting companies and their leaders in turning strategic and technological shifts into decisions, organizational capabilities, management models, and intelligent execution.',
     cardCta: 'Explore solutions & deliverables',
     solutionsCountLabel: 'specialized products',
     backHomeLabel: 'Back to home',

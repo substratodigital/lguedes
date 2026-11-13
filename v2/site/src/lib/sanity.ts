@@ -24,7 +24,8 @@ export const sanityClient = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true,
+  // useCdn: false garante que o build sempre reflita imediatamente documentos recém-publicados
+  useCdn: false,
 });
 
 export interface PublicacoesData {
@@ -37,56 +38,108 @@ export interface PublicacoesData {
   artigosOpiniao: string[];
 }
 
+function normKey(s: string | undefined | null): string {
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+/**
+ * Mescla itens vindos do Sanity com o acervo estático local:
+ * - Itens novos do Sanity entram automaticamente.
+ * - Caso um item no Sanity tenha o mesmo título de um estático, o do Sanity prevalece.
+ * - Mantém ordenação decrescente por ano.
+ */
+function mergeWithStatic<T extends { ano?: number }>(
+  sanityItems: T[] | undefined | null,
+  staticItems: T[],
+  keyFn: (item: T) => string
+): T[] {
+  if (!Array.isArray(sanityItems) || sanityItems.length === 0) return staticItems;
+  const seen = new Map<string, T>();
+  for (const item of sanityItems) {
+    const k = normKey(keyFn(item));
+    if (k) seen.set(k, item);
+  }
+  for (const item of staticItems) {
+    const k = normKey(keyFn(item));
+    if (k && !seen.has(k)) {
+      seen.set(k, item);
+    }
+  }
+  return Array.from(seen.values()).sort((a, b) => (Number(b.ano) || 0) - (Number(a.ano) || 0));
+}
+
+function mergeStrings(sanityList: string[] | undefined | null, staticList: string[]): string[] {
+  if (!Array.isArray(sanityList) || sanityList.length === 0) return staticList;
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const s of [...sanityList, ...staticList]) {
+    if (!s) continue;
+    const k = normKey(s);
+    if (!seen.has(k)) {
+      seen.add(k);
+      out.push(s);
+    }
+  }
+  return out;
+}
+
 export async function getPublicacoesData(): Promise<PublicacoesData> {
   try {
     const query = `{
-      "artigos": *[_type == "artigoPeriodico"] | order(ano desc) {
+      "artigos": *[_type == "artigoPeriodico"] | order(ano desc, _createdAt desc) {
         ano,
         titulo,
         periodico,
         url
       },
-      "congressos": *[_type == "congresso"] | order(ano desc) {
+      "congressos": *[_type == "congresso"] | order(ano desc, _createdAt desc) {
         ano,
         titulo,
-        evento
+        evento,
+        url
       },
-      "livros": *[_type == "livro"] | order(ano desc) {
+      "livros": *[_type == "livro"] | order(ano desc, _createdAt desc) {
         ano,
         titulo,
         editora,
-        url
+        url,
+        "capaUrl": capa.asset->url
       },
-      "capitulos": *[_type == "capitulo"] | order(ano desc) {
+      "capitulos": *[_type == "capitulo"] | order(ano desc, _createdAt desc) {
         ano,
         titulo,
         livro,
-        editora
+        editora,
+        url
       },
-      "premios": *[_type == "premio"] | order(ano desc) {
+      "premios": *[_type == "premio"] | order(ano desc, _createdAt desc) {
         ano,
         premio,
         concedido
       },
-      "midia": *[_type == "midia"] | order(ano desc) {
+      "midia": *[_type == "midia"] | order(ano desc, _createdAt desc) {
         ano,
         titulo,
         tipo,
         url
       },
-      "artigosOpiniao": *[_type == "artigoOpiniao"].titulo
+      "artigosOpiniao": *[_type == "artigoOpiniao"] | order(_createdAt desc).titulo
     }`;
 
     const res = await sanityClient.fetch(query);
 
     return {
-      artigos: res?.artigos?.length ? res.artigos : ARTIGOS_PERIODICOS,
-      congressos: res?.congressos?.length ? res.congressos : CONGRESSOS,
-      livros: res?.livros?.length ? res.livros : LIVROS,
-      capitulos: res?.capitulos?.length ? res.capitulos : CAPITULOS,
-      premios: res?.premios?.length ? res.premios : PREMIOS,
-      midia: res?.midia?.length ? res.midia : MIDIA,
-      artigosOpiniao: res?.artigosOpiniao?.length ? res.artigosOpiniao : ARTIGOS_OPINIAO,
+      artigos: mergeWithStatic<ArtigoPeriodico>(res?.artigos, ARTIGOS_PERIODICOS, (x) => x.titulo),
+      congressos: mergeWithStatic<Congresso>(res?.congressos, CONGRESSOS, (x) => x.titulo),
+      livros: mergeWithStatic<Livro>(res?.livros, LIVROS, (x) => x.titulo),
+      capitulos: mergeWithStatic<Capitulo>(res?.capitulos, CAPITULOS, (x) => x.titulo),
+      premios: mergeWithStatic<Premio>(res?.premios, PREMIOS, (x) => `${x.ano}-${x.premio}`),
+      midia: mergeWithStatic<Midia>(res?.midia, MIDIA, (x) => x.titulo),
+      artigosOpiniao: mergeStrings(res?.artigosOpiniao, ARTIGOS_OPINIAO),
     };
   } catch (err) {
     console.warn('[Sanity] Falha ao buscar dados ou projeto sem conexão ativa. Usando dados estáticos locais.', err);

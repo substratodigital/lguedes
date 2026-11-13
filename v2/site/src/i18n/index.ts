@@ -21,8 +21,9 @@ export const homePath = (lang: Lang) => (lang === 'pt' ? '/' : `/${lang}/`);
 
 export const SITE = {
   name: 'Luís Guedes',
-  url: 'https://guedes.ai',
+  url: 'https://lguedes.com.br',
   whatsapp: 'https://wa.me/5511999587672',
   linkedin: 'https://linkedin.com/in/lguedes',
+  lattes: 'http://lattes.cnpq.br/3044172197355296',
   email: 'lguedes.sp@gmail.com',
 };

@@ -20,20 +20,28 @@ const name = 'Luís Guedes';
       {t.hero.badge}
     </p>
 
-    <h1 class="hero__title font-pixel" id="hero-title" aria-label={name}>
+    <h1 class="hero__title" id="hero-title" aria-label={name}>
       {name.split('').map((ch) => (
         <span class="hero__char" aria-hidden="true">{ch === ' ' ? '\u00A0' : ch}</span>
       ))}
     </h1>
 
+    <div class="hero__pillars" data-hero-in>
+      {(t.hero.pillars ?? ['Estratégia', 'IA', 'Transformação Organizacional', 'Execução']).map((pillar: string) => (
+        <span class="hero__pillar">{pillar}</span>
+      ))}
+    </div>
+
     <p class="hero__sub" data-hero-in>{t.hero.p}</p>
 
     <div class="hero__ctas" data-hero-in>
-      <a href="#palestras" class="btn" id="hero-cta-palestras">
-        {t.hero.cta2}
+      <a href="#contato" class="btn hero__cta-btn" id="hero-cta-contato">
+        {t.hero.cta1}
         <Icon name="ArrowRight" size={18} stroke={2} />
       </a>
-      <a href="#contato" class="hero__link" id="hero-cta-contato">{t.hero.cta1}</a>
+      <a href="#consultoria" class="btn btn-outline hero__cta-btn" id="hero-cta-consultoria">
+        {t.hero.cta2}
+      </a>
     </div>
   </div>
 
@@ -62,7 +70,7 @@ const name = 'Luís Guedes';
   .hero__canvas { width: 100%; height: 100%; display: block; }
   .hero__fallback {
     display: none; position: absolute; bottom: 0; right: 8%; height: 92%; width: auto;
-    filter: grayscale(1) contrast(1.15); mix-blend-mode: multiply; opacity: .9;
+    filter: grayscale(1) contrast(1.08); mix-blend-mode: multiply; opacity: .92;
   }
   :global(.no-webgl) .hero__fallback { display: block; }
   :global(.no-webgl) .hero__canvas { display: none; }
@@ -82,37 +90,62 @@ const name = 'Luís Guedes';
 
   .hero__badge {
     display: inline-flex; align-items: center; gap: .55rem;
-    font-family: var(--font-pixel); font-size: var(--fs-xs);
-    letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2);
+    font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2);
     padding: .45rem 1rem; border-radius: var(--radius-pill);
-    background: hsl(0 0% 100% / .7); border: 1px solid var(--line);
+    background: hsl(0 0% 100% / .78); border: 1px solid var(--line);
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     margin-bottom: 1.1rem;
   }
   .hero__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px hsl(243 75% 59% / .15); }
 
   .hero__title {
-    font-size: var(--fs-hero);
-    line-height: .95;
-    letter-spacing: -0.02em;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: clamp(3.25rem, 1.8rem + 6.4vw, 6.75rem);
+    line-height: .96;
+    letter-spacing: -0.04em;
     color: var(--ink);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.15rem;
     white-space: nowrap;
   }
   .hero__char { display: inline-block; will-change: transform; }
 
+  .hero__pillars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 1.15rem;
+  }
+  .hero__pillar {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: hsl(243 90% 96% / 0.85);
+    border: 1px solid hsl(243 75% 59% / 0.22);
+    padding: 0.28rem 0.75rem;
+    border-radius: var(--radius-pill);
+    backdrop-filter: blur(6px);
+  }
+
   .hero__sub {
-    font-size: var(--fs-lg); color: var(--ink-2); font-weight: 500;
-    max-width: 52ch; line-height: 1.35;
+    font-size: var(--fs-lg); color: var(--ink-2); font-weight: 450;
+    max-width: 50ch; line-height: 1.48;
     margin-bottom: 2rem;
   }
-  .hero__ctas { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-  .hero__link {
-    font-size: .9rem; font-weight: 600; color: var(--ink);
-    background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat;
-    padding-bottom: 2px; transition: background-size .4s var(--ease-out), color .2s;
+  .hero__ctas {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
-  .hero__link:hover { color: var(--primary); background-size: 0 1px; background-position: 100% 100%; }
+  .hero__cta-btn {
+    min-width: 245px;
+    justify-content: center;
+  }
 
   .hero__scroll {
     position: absolute; z-index: 2; right: var(--gutter); bottom: 2rem;
@@ -148,8 +181,16 @@ const name = 'Luís Guedes';
       padding-top: 0.5rem;
       padding-bottom: 0;
     }
-    .hero__title { font-size: clamp(2.85rem, 13.5vw, 4.5rem); }
-    .hero__ctas { justify-content: center; }
+    .hero__title { font-size: clamp(2.65rem, 12vw, 4.25rem); }
+    .hero__pillars { justify-content: center; }
+    .hero__ctas {
+      justify-content: center;
+      width: 100%;
+    }
+    .hero__cta-btn {
+      width: 100%;
+      max-width: 320px;
+    }
     .hero__sub { margin-inline: auto; margin-bottom: 1.5rem; }
     .hero__fallback {
       left: 50%;
@@ -184,6 +225,7 @@ const name = 'Luís Guedes';
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.1 });
   tl.to('.hero__badge', { opacity: 1, y: 0, duration: 0.6, startAt: { y: -10 } })
     .to('.hero__char', { opacity: 1, y: 0, duration: 0.7, stagger: 0.035, startAt: { y: 28 } }, '-=0.35')
+    .to('.hero__pillars', { opacity: 1, y: 0, duration: 0.55, startAt: { y: 12 } }, '-=0.45')
     .to('.hero__sub', { opacity: 1, y: 0, duration: 0.6, startAt: { y: 14 } }, '-=0.45')
     .to('.hero__ctas, .hero__scroll', { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, startAt: { y: 12 } }, '-=0.4');
   if (reduced) tl.progress(1);
@@ -193,7 +235,7 @@ const name = 'Luís Guedes';
       if (!fx) { hero.classList.add('no-webgl'); return; }
       if (fx.reduced) return;
       const p = { v: 0 };
-      gsap.to(p, { v: 1, duration: 2.4, ease: 'power2.inOut', onUpdate: () => fx.setReveal(p.v) });
+      gsap.to(p, { v: 1, duration: 2.2, ease: 'power2.inOut', onUpdate: () => fx.setReveal(p.v) });
     })
     .catch(() => hero.classList.add('no-webgl'));
 

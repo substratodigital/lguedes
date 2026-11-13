@@ -2,7 +2,7 @@
 import { type Lang, useT } from '../i18n';
 import Icon from './Icon.astro';
 import { getPublicacoesData } from '../lib/sanity';
-
+import { TEXTOS_REVISTAS, LEITURAS_ATUAIS } from '../data/publicacoes';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -19,18 +19,18 @@ const {
   artigosOpiniao: ARTIGOS_OPINIAO
 } = await getPublicacoesData();
 
-
 const TABS = [
   { id: 'cientificas', label: pub.tabs[0], icon: 'BookOpen' as const },
-  { id: 'livros', label: pub.tabs[1], icon: 'BookMarked' as const },
-  { id: 'premios', label: pub.tabs[2], icon: 'Award' as const },
-  { id: 'midia', label: pub.tabs[3], icon: 'Mic' as const },
-  { id: 'academicas', label: pub.tabs[4], icon: 'GraduationCap' as const },
-  { id: 'opiniao', label: pub.tabs[5], icon: 'Newspaper' as const },
+  { id: 'livros',      label: pub.tabs[1], icon: 'BookMarked' as const },
+  { id: 'premios',     label: pub.tabs[2], icon: 'Award' as const },
+  { id: 'midia',       label: pub.tabs[3], icon: 'Mic' as const },
+  { id: 'academicas',  label: pub.tabs[4], icon: 'GraduationCap' as const },
+  { id: 'opiniao',     label: pub.tabs[5], icon: 'Newspaper' as const },
+  { id: 'leituras',    label: pub.tabs[6] ?? 'O que estou lendo', icon: 'Sparkles' as const },
 ];
 ---
 
-<section id="publicacoes" class="section publicacoes">
+<section id="publicacoes" class="section publicacoes" data-ver-mais={pub.verMais} data-ver-menos={pub.verMenos} data-acessar={pub.acessar} data-livro-label={pub.livroLabel} data-comprar-label={pub.comprarLabel}>
   <div class="container">
     <div class="publicacoes__header" data-reveal>
       <span class="eyebrow">{pub.label}</span>
@@ -73,7 +73,7 @@ const TABS = [
         <div id="subpanel-artigos" class="pub-subpanel is-active">
           <div class="pub-grid" id="artigos-grid">
             {ARTIGOS_PERIODICOS.map((a, i) => (
-              <div class:list={['pub-card', { 'is-hidden': i >= 6 }]} data-artigo-item>
+              <div class:list={['pub-card', { 'is-hidden': i >= 6 }]} data-artigo-item data-item-title={a.titulo}>
                 <div class="pub-card__meta">
                   <span class="pub-card__year font-mono">{a.ano}</span>
                   {a.url && (
@@ -100,7 +100,7 @@ const TABS = [
         <!-- Sub-panel Congressos e Conferências -->
         <div id="subpanel-congressos" class="pub-subpanel">
           <div class="pub-table-wrap">
-            <table class="pub-table">
+            <table class="pub-table" id="congressos-table">
               <thead>
                 <tr>
                   <th class="font-mono w-year">{pub.anoLabel}</th>
@@ -110,9 +110,17 @@ const TABS = [
               </thead>
               <tbody>
                 {CONGRESSOS.map((c, i) => (
-                  <tr class:list={[{ 'is-hidden': i >= 8 }]} data-congresso-item>
+                  <tr class:list={[{ 'is-hidden': i >= 8 }]} data-congresso-item data-item-title={c.titulo}>
                     <td class="font-mono">{c.ano}</td>
-                    <td class="pub-table__title">{c.titulo}</td>
+                    <td class="pub-table__title">
+                      {c.url ? (
+                        <a href={c.url} target="_blank" rel="noopener noreferrer" class="pub-table__link">
+                          {c.titulo} <Icon name="ExternalLink" size={13} />
+                        </a>
+                      ) : (
+                        c.titulo
+                      )}
+                    </td>
                     <td class="pub-table__event">{c.evento}</td>
                   </tr>
                 ))}
@@ -133,30 +141,41 @@ const TABS = [
       <!-- 2. LIVROS & CAPÍTULOS -->
       <div id="tab-panel-livros" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-livros">
         <div class="pub-livros-section">
-          {LIVROS.map((l) => (
-            <div class="featured-book">
-              <div class="featured-book__cover font-pixel">
-                <Icon name="BookMarked" size={36} stroke={1} />
-              </div>
-              <div class="featured-book__info">
-                <div class="pub-card__meta">
-                  <span class="pub-card__badge">{pub.livroLabel}</span>
-                  <span class="pub-card__year font-mono">{l.ano}</span>
+          <div class="books-grid" id="livros-grid">
+            {LIVROS.map((l) => (
+              <div class="featured-book" data-livro-item data-item-title={l.titulo}>
+                <div class:list={['featured-book__cover', { 'has-img': Boolean(l.capaUrl) }]}>
+                  {l.capaUrl ? (
+                    <img src={l.capaUrl} alt={`Capa do livro ${l.titulo}`} class="featured-book__img" loading="lazy" />
+                  ) : (
+                    <div class="book-jacket">
+                      <span class="book-jacket__spine" aria-hidden="true"></span>
+                      <span class="book-jacket__year font-mono">{l.ano}</span>
+                      <strong class="book-jacket__title">{l.titulo}</strong>
+                      <span class="book-jacket__author font-mono">LUÍS GUEDES</span>
+                    </div>
+                  )}
                 </div>
-                <h3 class="featured-book__title">{l.titulo}</h3>
-                <p class="featured-book__publisher">{l.editora}</p>
-                {l.url && (
-                  <a href={l.url} target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="margin-top:0.75rem;">
-                    {pub.comprarLabel} <Icon name="ExternalLink" size={14} />
-                  </a>
-                )}
+                <div class="featured-book__info">
+                  <div class="pub-card__meta">
+                    <span class="pub-card__badge">{pub.livroLabel}</span>
+                    <span class="pub-card__year font-mono">{l.ano}</span>
+                  </div>
+                  <h3 class="featured-book__title">{l.titulo}</h3>
+                  <p class="featured-book__publisher">{l.editora}</p>
+                  {l.url && (
+                    <a href={l.url} target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="margin-top:0.9rem;">
+                      {pub.comprarLabel} <Icon name="ExternalLink" size={14} />
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
-          <h3 class="pub-section-subtitle font-pixel">{pub.capitulosLabel}</h3>
+          <h3 class="pub-section-subtitle font-mono">{pub.capitulosLabel}</h3>
           <div class="pub-table-wrap">
-            <table class="pub-table">
+            <table class="pub-table" id="capitulos-table">
               <thead>
                 <tr>
                   <th class="font-mono w-year">{pub.anoLabel}</th>
@@ -167,9 +186,17 @@ const TABS = [
               </thead>
               <tbody>
                 {CAPITULOS.map((cap) => (
-                  <tr>
+                  <tr data-capitulo-item data-item-title={cap.titulo}>
                     <td class="font-mono">{cap.ano}</td>
-                    <td class="pub-table__title">{cap.titulo}</td>
+                    <td class="pub-table__title">
+                      {cap.url ? (
+                        <a href={cap.url} target="_blank" rel="noopener noreferrer" class="pub-table__link">
+                          {cap.titulo} <Icon name="ExternalLink" size={13} />
+                        </a>
+                      ) : (
+                        cap.titulo
+                      )}
+                    </td>
                     <td class="pub-table__event"><em>{cap.livro}</em></td>
                     <td class="pub-table__event">{cap.editora}</td>
                   </tr>
@@ -183,7 +210,7 @@ const TABS = [
       <!-- 3. PRÊMIOS -->
       <div id="tab-panel-premios" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-premios">
         <div class="pub-table-wrap">
-          <table class="pub-table">
+          <table class="pub-table" id="premios-table">
             <thead>
               <tr>
                 <th class="font-mono w-year">{pub.anoLabel}</th>
@@ -193,7 +220,7 @@ const TABS = [
             </thead>
             <tbody>
               {PREMIOS.map((p, i) => (
-                <tr class:list={[{ 'is-hidden': i >= 8 }]} data-premio-item>
+                <tr class:list={[{ 'is-hidden': i >= 8 }]} data-premio-item data-item-title={p.premio}>
                   <td class="font-mono">{p.ano}</td>
                   <td class="pub-table__title">{p.premio}</td>
                   <td class="pub-table__event">{p.concedido}</td>
@@ -214,9 +241,9 @@ const TABS = [
 
       <!-- 4. NA MÍDIA -->
       <div id="tab-panel-midia" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-midia">
-        <div class="pub-grid">
+        <div class="pub-grid" id="midia-grid">
           {MIDIA.map((m, i) => (
-            <div class:list={['pub-card', { 'is-hidden': i >= 8 }]} data-midia-item>
+            <div class:list={['pub-card', { 'is-hidden': i >= 9 }]} data-midia-item data-item-title={m.titulo}>
               <div class="pub-card__meta">
                 <span class="pub-card__badge">{m.tipo}</span>
                 <span class="pub-card__year font-mono">{m.ano}</span>
@@ -230,10 +257,10 @@ const TABS = [
             </div>
           ))}
         </div>
-        {MIDIA.length > 8 && (
+        {MIDIA.length > 9 && (
           <div class="pub-more">
             <button type="button" class="pub-more-btn" id="btn-toggle-midia" data-expanded="false">
-              <span class="pub-more-text">{pub.verMais} ({MIDIA.length - 8})</span>
+              <span class="pub-more-text">{pub.verMais} ({MIDIA.length - 9})</span>
               <span class="pub-more-arrow"><Icon name="ChevronDown" size={16} /></span>
             </button>
           </div>
@@ -242,6 +269,17 @@ const TABS = [
 
       <!-- 5. ATIVIDADES ACADÊMICAS -->
       <div id="tab-panel-academicas" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-academicas">
+        {pub.academicasMetrics && (
+          <div class="academic-metrics">
+            {pub.academicasMetrics.map((m: { badge: string; title: string; desc: string }) => (
+              <article class="academic-metric-card">
+                <span class="academic-metric-card__badge font-mono">{m.badge}</span>
+                <h4 class="academic-metric-card__title">{m.title}</h4>
+                <p class="academic-metric-card__desc">{m.desc}</p>
+              </article>
+            ))}
+          </div>
+        )}
         <div class="academic-list">
           {pub.atividades.map((item: string) => (
             <div class="academic-item">
@@ -252,21 +290,37 @@ const TABS = [
         </div>
       </div>
 
-      <!-- 6. ARTIGOS DE OPINIÃO -->
+      <!-- 6. ARTIGOS DE OPINIÃO & REVISTAS -->
       <div id="tab-panel-opiniao" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-opiniao">
-        <p class="pub-opiniao-desc font-mono">{pub.opiniaoSource}</p>
+        <div class="pub-revistas-block">
+          <p class="pub-opiniao-desc font-mono">{pub.revistasTitle ?? 'Colunas e Artigos em Revistas e Portais'}</p>
+          <div class="pub-grid pub-grid--revistas">
+            {TEXTOS_REVISTAS.map((r) => (
+              <div class="pub-card">
+                <div class="pub-card__meta">
+                  <span class="pub-card__badge">{r.veiculo}</span>
+                  <span class="pub-card__year font-mono">{r.ano}</span>
+                </div>
+                <h4 class="pub-card__title">{r.titulo}</h4>
+                <a href={r.url} target="_blank" rel="noopener noreferrer" class="pub-card__link">
+                  {pub.acessar} <Icon name="ExternalLink" size={12} />
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p class="pub-opiniao-desc font-mono" style="margin-top: 2.5rem;">{pub.opiniaoSource}</p>
         <div class="pub-table-wrap">
-          <table class="pub-table">
+          <table class="pub-table" id="opiniao-table">
             <thead>
               <tr>
-                <th class="font-mono w-year">#</th>
                 <th class="font-mono">{pub.tituloLabel}</th>
               </tr>
             </thead>
             <tbody>
               {ARTIGOS_OPINIAO.map((tit, i) => (
-                <tr class:list={[{ 'is-hidden': i >= 12 }]} data-opiniao-item>
-                  <td class="font-mono text-muted">{String(i + 1).padStart(2, '0')}</td>
+                <tr class:list={[{ 'is-hidden': i >= 12 }]} data-opiniao-item data-item-title={tit}>
                   <td class="pub-table__title">{tit}</td>
                 </tr>
               ))}
@@ -281,6 +335,24 @@ const TABS = [
             </button>
           </div>
         )}
+      </div>
+
+      <!-- 7. O QUE ESTOU LENDO -->
+      <div id="tab-panel-leituras" role="tabpanel" class="pub-panel" aria-labelledby="tab-btn-leituras">
+        <p class="pub-leituras-intro">{pub.leiturasIntro}</p>
+        <div class="pub-grid">
+          {LEITURAS_ATUAIS.map((item) => (
+            <article class="pub-card pub-card--reading">
+              <div class="pub-card__meta">
+                <span class="pub-card__badge">{item.categoria}</span>
+                <Icon name="BookOpen" size={15} class="pub-reading-icon" />
+              </div>
+              <h4 class="pub-card__title">{item.titulo}</h4>
+              <p class="pub-reading-author font-mono">{item.autor}</p>
+              <p class="pub-reading-note">{item.nota}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   </div>
@@ -395,6 +467,7 @@ const TABS = [
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
   }
   .pub-card__year {
     font-size: var(--fs-xs);
@@ -479,65 +552,168 @@ const TABS = [
     color: var(--ink);
     line-height: 1.45;
   }
+  .pub-table__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--ink);
+    transition: color 0.2s;
+  }
+  .pub-table__link:hover {
+    color: var(--primary);
+  }
   .pub-table__event {
     color: var(--ink-2);
     font-size: 0.825rem;
     line-height: 1.4;
   }
-  .text-muted {
-    color: var(--ink-3);
-  }
 
-  /* Livro Destaque */
+  /* Livros Destaque (Editorial Covers) */
   .pub-livros-section {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 2.75rem;
+  }
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1.5rem;
   }
   .featured-book {
     display: flex;
-    gap: 2rem;
+    gap: 1.75rem;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
+    padding: 2rem;
     align-items: center;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .featured-book:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
   }
   .featured-book__cover {
-    width: 130px;
-    height: 170px;
-    border-radius: var(--radius-sm);
-    background: linear-gradient(135deg, var(--primary), var(--violet));
+    width: 132px;
+    height: 184px;
+    border-radius: 6px 10px 10px 6px;
+    background: linear-gradient(145deg, #1e1b4b 0%, #312e81 48%, #4f46e5 100%);
     color: #fff;
-    display: grid;
-    place-items: center;
-    font-size: 0.9rem;
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
+    box-shadow:
+      -4px 0 0 #111827,
+      0 14px 28px -8px rgba(30, 27, 75, 0.35);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+  }
+  .featured-book__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .book-jacket {
+    padding: 1rem 0.9rem 0.9rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  .book-jacket__spine {
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.22);
+  }
+  .book-jacket__year {
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    color: #c7d2fe;
+  }
+  .book-jacket__title {
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .book-jacket__author {
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    color: #e0e7ff;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 0.45rem;
   }
   .featured-book__title {
-    font-size: 1.5rem;
+    font-size: 1.28rem;
     font-weight: 700;
     color: var(--ink);
-    margin-block: 0.5rem 0.25rem;
+    line-height: 1.25;
+    margin-block: 0.5rem 0.35rem;
   }
   .featured-book__publisher {
     color: var(--ink-2);
-    font-size: 0.95rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
   }
   .pub-section-subtitle {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
+    font-weight: 700;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--primary);
+    margin-bottom: -1.5rem;
   }
 
   /* Atividades Acadêmicas */
+  .academic-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .academic-metric-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--primary);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .academic-metric-card__badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 0.45rem;
+  }
+  .academic-metric-card__title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+  }
+  .academic-metric-card__desc {
+    font-size: 0.88rem;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
   .academic-list {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-width: 52rem;
+    max-width: 56rem;
   }
   .academic-item {
     display: flex;
@@ -546,27 +722,49 @@ const TABS = [
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
-    padding: 1.5rem 2rem;
+    padding: 1.35rem 1.75rem;
   }
   .academic-item__icon {
     color: var(--primary);
     font-size: 1.1rem;
     flex-shrink: 0;
-    margin-top: 0.1rem;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 1px solid hsl(243 75% 59% / .3);
+    display: grid;
+    place-items: center;
   }
   .academic-item__text {
-    font-size: 1rem;
+    font-size: 0.98rem;
     color: var(--ink-2);
     line-height: 1.6;
   }
 
-  /* Artigos de Opinião */
+  /* Artigos de Opinião & Leituras */
   .pub-opiniao-desc {
     color: var(--ink-3);
     font-size: var(--fs-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .pub-leituras-intro {
+    font-size: 1rem;
+    color: var(--ink-2);
+    max-width: 54ch;
+    margin-bottom: 1.75rem;
+  }
+  .pub-reading-author {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .pub-reading-note {
+    font-size: 0.9rem;
+    color: var(--ink-2);
+    line-height: 1.55;
+    margin-top: 0.25rem;
   }
 
   /* Botão Ver Mais */
@@ -593,15 +791,13 @@ const TABS = [
     border-color: var(--primary);
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
   @media (max-width: 640px) {
     .featured-book {
       flex-direction: column;
       align-items: flex-start;
+    }
+    .books-grid {
+      grid-template-columns: 1fr;
     }
   }
   .pub-tab-btn :global(.pub-tab-btn__icon) { color: var(--ink-3); transition: color .2s; }
@@ -611,32 +807,36 @@ const TABS = [
   .pub-card__link, .featured-book a { display: inline-flex; align-items: center; gap: .35rem; }
   .pub-more-arrow { display: inline-flex; transition: transform .35s var(--ease-out); }
   .pub-more-btn[data-expanded="true"] .pub-more-arrow { transform: rotate(180deg); }
-  .academic-item__icon { width: 2rem; height: 2rem; border-radius: 50%; border: 1px solid hsl(243 75% 59% / .3); display: grid; place-items: center; margin-top: 0; }
-  .featured-book__cover { color: #fff; }
 </style>
 
 <script>
   import { gsap } from 'gsap';
   const reducedPub = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  /** Anima a entrada dos itens de um painel (cards, linhas de tabela, blocos) */
+  const pubSection = document.getElementById('publicacoes');
+  const labelMais = pubSection?.getAttribute('data-ver-mais') || 'Ver mais';
+  const labelMenos = pubSection?.getAttribute('data-ver-menos') || 'Ver menos';
+  const labelAcessar = pubSection?.getAttribute('data-acessar') || 'Acessar';
+  const labelLivro = pubSection?.getAttribute('data-livro-label') || 'Livro Publicado';
+  const labelComprar = pubSection?.getAttribute('data-comprar-label') || 'Acessar obra';
+
   function animateIn(root: Element | null, onlyEls?: Element[]) {
     if (!root || reducedPub) return;
     const els = onlyEls ?? Array.from(root.querySelectorAll(
-      '.pub-subtabs, .pub-card:not(.is-hidden), .pub-table-wrap, .pub-table tbody tr:not(.is-hidden), .featured-book, .pub-section-subtitle, .academic-item, .pub-opiniao-desc, .pub-more'
+      '.pub-subtabs, .pub-card:not(.is-hidden), .pub-table-wrap, .pub-table tbody tr:not(.is-hidden), .featured-book, .pub-section-subtitle, .academic-metric-card, .academic-item, .pub-opiniao-desc, .pub-more'
     )).filter((el) => (el as HTMLElement).offsetParent !== null);
     gsap.fromTo(els, { autoAlpha: 0, y: 16 }, {
       autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out',
       stagger: { each: 0.035, from: 'start' }, overwrite: true, clearProps: 'transform',
     });
   }
-  // Entrada inicial quando a seção aparece
-  const pubSection = document.getElementById('publicacoes');
+
   if (pubSection && !reducedPub) {
     new IntersectionObserver(([e], o) => {
       if (!e.isIntersecting) return; o.disconnect();
       animateIn(document.querySelector('.pub-panel.is-active'));
     }, { threshold: 0.1 }).observe(pubSection.querySelector('.pub-panels')!);
   }
+
   // Controle de abas principais
   const tabBtns = document.querySelectorAll<HTMLButtonElement>('[data-tab-target]');
   const panels = document.querySelectorAll<HTMLElement>('.pub-panel');
@@ -676,12 +876,12 @@ const TABS = [
   });
 
   // Ver mais genérico
-  function setupExpandToggle(btnId: string, itemSelector: string, baseCount: number, labelMais: string, labelMenos: string) {
+  function setupExpandToggle(btnId: string, itemSelector: string, baseCount: number) {
     const btn = document.getElementById(btnId);
     if (!btn) return;
-    const items = document.querySelectorAll<HTMLElement>(itemSelector);
 
     btn.addEventListener('click', () => {
+      const items = document.querySelectorAll<HTMLElement>(itemSelector);
       const isExpanded = btn.getAttribute('data-expanded') === 'true';
       const nextExpanded = !isExpanded;
       btn.setAttribute('data-expanded', String(nextExpanded));
@@ -702,9 +902,129 @@ const TABS = [
     });
   }
 
-  setupExpandToggle('btn-toggle-artigos', '[data-artigo-item]', 6, 'Ver mais', 'Ver menos');
-  setupExpandToggle('btn-toggle-congressos', '[data-congresso-item]', 8, 'Ver mais', 'Ver menos');
-  setupExpandToggle('btn-toggle-premios', '[data-premio-item]', 8, 'Ver mais', 'Ver menos');
-  setupExpandToggle('btn-toggle-midia', '[data-midia-item]', 8, 'Ver mais', 'Ver menos');
-  setupExpandToggle('btn-toggle-opiniao', '[data-opiniao-item]', 12, 'Ver mais', 'Ver menos');
+  setupExpandToggle('btn-toggle-artigos', '[data-artigo-item]', 6);
+  setupExpandToggle('btn-toggle-congressos', '[data-congresso-item]', 8);
+  setupExpandToggle('btn-toggle-premios', '[data-premio-item]', 8);
+  setupExpandToggle('btn-toggle-midia', '[data-midia-item]', 9);
+  setupExpandToggle('btn-toggle-opiniao', '[data-opiniao-item]', 12);
+
+  // Sincronização em tempo real com o Sanity Studio (para refletir novos livros/artigos publicados sem precisar de rebuild)
+  const SANITY_QUERY = `{
+    "artigos": *[_type == "artigoPeriodico"] | order(ano desc) { ano, titulo, periodico, url },
+    "livros": *[_type == "livro"] | order(ano desc) { ano, titulo, editora, url, "capaUrl": capa.asset->url },
+    "congressos": *[_type == "congresso"] | order(ano desc) { ano, titulo, evento, url },
+    "capitulos": *[_type == "capitulo"] | order(ano desc) { ano, titulo, livro, editora, url },
+    "midia": *[_type == "midia"] | order(ano desc) { ano, titulo, tipo, url },
+    "artigosOpiniao": *[_type == "artigoOpiniao"] | order(ordem asc) { titulo }
+  }`;
+  const SANITY_URL = `https://84rosfy5.api.sanity.io/v2024-01-01/data/query/production?query=${encodeURIComponent(SANITY_QUERY)}`;
+
+  const norm = (s: string) => (s || '').trim().toLowerCase();
+  const extIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
+
+  async function refreshPublicacoesFromSanity() {
+    try {
+      const res = await fetch(SANITY_URL, { cache: 'no-store' });
+      if (!res.ok) return;
+      const payload = await res.json();
+      const result = payload?.result;
+      if (!result) return;
+
+      // 1. Livros Publicados
+      const livrosGrid = document.getElementById('livros-grid');
+      if (livrosGrid && Array.isArray(result.livros)) {
+        const existingTitles = new Set(
+          Array.from(livrosGrid.querySelectorAll<HTMLElement>('[data-livro-item]'))
+            .map((el) => norm(el.dataset.itemTitle || ''))
+        );
+        result.livros.forEach((l: any) => {
+          if (!l?.titulo || existingTitles.has(norm(l.titulo))) return;
+          existingTitles.add(norm(l.titulo));
+          const card = document.createElement('div');
+          card.className = 'featured-book';
+          card.setAttribute('data-livro-item', '');
+          card.setAttribute('data-item-title', l.titulo);
+          card.innerHTML = `
+            <div class="featured-book__cover ${l.capaUrl ? 'has-img' : ''}">
+              ${l.capaUrl
+                ? `<img src="${l.capaUrl}" alt="Capa do livro ${l.titulo}" class="featured-book__img" loading="lazy" />`
+                : `<div class="book-jacket">
+                    <span class="book-jacket__spine" aria-hidden="true"></span>
+                    <span class="book-jacket__year font-mono">${l.ano || ''}</span>
+                    <strong class="book-jacket__title">${l.titulo}</strong>
+                    <span class="book-jacket__author font-mono">LUÍS GUEDES</span>
+                  </div>`
+              }
+            </div>
+            <div class="featured-book__info">
+              <div class="pub-card__meta">
+                <span class="pub-card__badge">${labelLivro}</span>
+                <span class="pub-card__year font-mono">${l.ano || ''}</span>
+              </div>
+              <h3 class="featured-book__title">${l.titulo}</h3>
+              <p class="featured-book__publisher">${l.editora || ''}</p>
+              ${l.url ? `<a href="${l.url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="margin-top:0.9rem;">${labelComprar} ${extIconSvg}</a>` : ''}
+            </div>
+          `;
+          livrosGrid.prepend(card);
+        });
+      }
+
+      // 2. Artigos em Periódicos
+      const artigosGrid = document.getElementById('artigos-grid');
+      if (artigosGrid && Array.isArray(result.artigos)) {
+        const existingTitles = new Set(
+          Array.from(artigosGrid.querySelectorAll<HTMLElement>('[data-artigo-item]'))
+            .map((el) => norm(el.dataset.itemTitle || ''))
+        );
+        result.artigos.forEach((a: any) => {
+          if (!a?.titulo || existingTitles.has(norm(a.titulo))) return;
+          existingTitles.add(norm(a.titulo));
+          const card = document.createElement('div');
+          card.className = 'pub-card';
+          card.setAttribute('data-artigo-item', '');
+          card.setAttribute('data-item-title', a.titulo);
+          card.innerHTML = `
+            <div class="pub-card__meta">
+              <span class="pub-card__year font-mono">${a.ano || ''}</span>
+              ${a.url ? `<a href="${a.url}" target="_blank" rel="noopener noreferrer" class="pub-card__ext" aria-label="Ler artigo ${a.titulo}">${extIconSvg}</a>` : ''}
+            </div>
+            <h4 class="pub-card__title">${a.titulo}</h4>
+            <p class="pub-card__source font-mono">${a.periodico || ''}</p>
+          `;
+          artigosGrid.prepend(card);
+        });
+      }
+
+      // 3. Na Mídia
+      const midiaGrid = document.getElementById('midia-grid');
+      if (midiaGrid && Array.isArray(result.midia)) {
+        const existingTitles = new Set(
+          Array.from(midiaGrid.querySelectorAll<HTMLElement>('[data-midia-item]'))
+            .map((el) => norm(el.dataset.itemTitle || ''))
+        );
+        result.midia.forEach((m: any) => {
+          if (!m?.titulo || existingTitles.has(norm(m.titulo))) return;
+          existingTitles.add(norm(m.titulo));
+          const card = document.createElement('div');
+          card.className = 'pub-card';
+          card.setAttribute('data-midia-item', '');
+          card.setAttribute('data-item-title', m.titulo);
+          card.innerHTML = `
+            <div class="pub-card__meta">
+              <span class="pub-card__badge">${m.tipo || 'Mídia'}</span>
+              <span class="pub-card__year font-mono">${m.ano || ''}</span>
+            </div>
+            <h4 class="pub-card__title">${m.titulo}</h4>
+            ${m.url ? `<a href="${m.url}" target="_blank" rel="noopener noreferrer" class="pub-card__link">${labelAcessar} ${extIconSvg}</a>` : ''}
+          `;
+          midiaGrid.prepend(card);
+        });
+      }
+    } catch {
+      // Fallback estático mantido silenciosamente se offline
+    }
+  }
+
+  refreshPublicacoesFromSanity();
 </script>
