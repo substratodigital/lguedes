@@ -262,7 +262,16 @@ export async function initHeroAscii(canvas: HTMLCanvasElement, opts: Opts) {
   function rect(): [number, number, number, number] {
     const { w, h } = state;
     const mobile = window.innerWidth < 768;
-    let ih = mobile ? h * 0.96 : h * 0.94;
+    if (mobile) {
+      // Mobile: retrato amplo na largura, ancorado no topo; a parte inferior
+      // da imagem é cortada pela altura do palco (mais rosto, menos altura).
+      const iwM = w * 1.12;
+      const ihM = iwM / aspect;
+      const xM = w * 0.47 - iwM / 2;
+      const yM = h * 0.015;
+      return [xM, yM, iwM, ihM];
+    }
+    let ih = h * 0.94;
     let iw = ih * aspect;
     if (iw > w * (mobile ? 0.96 : 0.6)) {
       iw = w * (mobile ? 0.96 : 0.6);
